@@ -1,0 +1,7 @@
+/* 
+   Este arquivo simula um vídeo de fundo corporativo
+   Em produção, substitua por um arquivo MP4 real
+   Dimensões recomendadas: 1920x1080 ou 1280x720
+   Duração: 10-30 segundos em loop
+   Formato: MP4 (H.264)
+*/

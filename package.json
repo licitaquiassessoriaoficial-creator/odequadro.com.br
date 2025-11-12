@@ -1,0 +1,36 @@
+{
+  "name": "odequadro-website",
+  "version": "1.0.0",
+  "description": "Recreação do site oficial da O de Quadro - Centro de negócios multiespecialistas",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server --port=8080 --entry-file=index.html",
+    "build": "echo 'Static site - no build needed'",
+    "lint": "echo 'Linting not configured yet'"
+  },
+  "keywords": [
+    "website",
+    "html",
+    "css",
+    "javascript",
+    "responsive",
+    "business"
+  ],
+  "author": "O de Quadro Recreation",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1",
+    "live-server": "^1.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "local"
+  },
+  "homepage": ".",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
