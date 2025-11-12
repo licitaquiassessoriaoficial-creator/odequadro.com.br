@@ -224,4 +224,112 @@ document.addEventListener('DOMContentLoaded', function() {
       }, index * 200);
     });
   });
+
+  // Form handling
+  const contactForm = document.querySelector('.contact-form');
+  const newsletterForm = document.querySelector('.newsletter-form');
+
+  // Contact form handling
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      const submitBtn = this.querySelector('#submit-btn');
+      
+      // Show loading state
+      submitBtn.classList.add('loading');
+      
+      // Basic validation
+      const requiredFields = this.querySelectorAll('[required]');
+      let isValid = true;
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.style.borderColor = '#dc3545';
+          field.style.borderWidth = '2px';
+        } else {
+          field.style.borderColor = '#28a745';
+          field.style.borderWidth = '2px';
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        submitBtn.classList.remove('loading');
+        showFormMessage('Por favor, preencha todos os campos obrigatórios.', 'error', contactForm);
+        return;
+      }
+      
+      // Email validation
+      const emailField = this.querySelector('[type="email"]');
+      if (emailField && !isValidEmail(emailField.value)) {
+        e.preventDefault();
+        submitBtn.classList.remove('loading');
+        emailField.style.borderColor = '#dc3545';
+        emailField.style.borderWidth = '2px';
+        showFormMessage('Por favor, insira um e-mail válido.', 'error', contactForm);
+        return;
+      }
+    });
+  }
+
+  // Newsletter form handling
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', function(e) {
+      const submitBtn = this.querySelector('#newsletter-btn');
+      const emailField = this.querySelector('[type="email"]');
+      
+      // Show loading state
+      submitBtn.classList.add('loading');
+      
+      // Email validation
+      if (!emailField.value.trim() || !isValidEmail(emailField.value)) {
+        e.preventDefault();
+        submitBtn.classList.remove('loading');
+        emailField.style.borderColor = '#dc3545';
+        emailField.style.borderWidth = '2px';
+        showFormMessage('Por favor, insira um e-mail válido.', 'error', newsletterForm);
+        return;
+      } else {
+        emailField.style.borderColor = '#28a745';
+        emailField.style.borderWidth = '2px';
+      }
+    });
+  }
+
+  // Helper functions
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  function showFormMessage(message, type, form) {
+    // Remove existing messages
+    const existingMessage = form.querySelector('.form-message');
+    if (existingMessage) {
+      existingMessage.remove();
+    }
+    
+    // Create new message
+    const messageEl = document.createElement('div');
+    messageEl.className = `form-message ${type}`;
+    messageEl.textContent = message;
+    
+    // Insert message at the beginning of the form
+    form.insertBefore(messageEl, form.firstChild);
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      if (messageEl.parentNode) {
+        messageEl.remove();
+      }
+    }, 5000);
+  }
+
+  // Reset field styles on input
+  document.querySelectorAll('input, textarea, select').forEach(field => {
+    field.addEventListener('input', function() {
+      this.style.borderColor = '';
+      this.style.borderWidth = '';
+    });
+  });
 });
