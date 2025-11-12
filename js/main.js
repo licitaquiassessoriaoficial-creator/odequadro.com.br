@@ -332,4 +332,204 @@ document.addEventListener('DOMContentLoaded', function() {
       this.style.borderWidth = '';
     });
   });
+
+  // Reviews Carousel
+  const reviewsCarousel = {
+    track: document.getElementById('reviewsTrack'),
+    prevBtn: document.getElementById('prevBtn'),
+    nextBtn: document.getElementById('nextBtn'),
+    dotsContainer: document.getElementById('carouselDots'),
+    currentIndex: 0,
+    cardsVisible: 3,
+    totalCards: 0,
+    cardWidth: 0,
+    autoPlayInterval: null,
+
+    init() {
+      if (!this.track) return;
+
+      this.totalCards = this.track.children.length;
+      this.updateCardsVisible();
+      this.createDots();
+      this.updateCarousel();
+      this.bindEvents();
+      this.startAutoPlay();
+    },
+
+    updateCardsVisible() {
+      const containerWidth = this.track.parentElement.offsetWidth;
+      if (containerWidth <= 768) {
+        this.cardsVisible = 1;
+      } else if (containerWidth <= 1024) {
+        this.cardsVisible = 2;
+      } else {
+        this.cardsVisible = 3;
+      }
+      
+      // Calcula a largura do card baseada no container
+      this.cardWidth = (containerWidth - (this.cardsVisible - 1) * 32) / this.cardsVisible; // 32px = gap entre cards
+      
+      // Atualiza a largura dos cards
+      Array.from(this.track.children).forEach(card => {
+        card.style.flex = `0 0 ${this.cardWidth}px`;
+      });
+    },
+
+    createDots() {
+      if (!this.dotsContainer) return;
+      
+      this.dotsContainer.innerHTML = '';
+      const maxSlides = Math.max(0, this.totalCards - this.cardsVisible + 1);
+      
+      for (let i = 0; i < maxSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'carousel-dot';
+        dot.setAttribute('aria-label', `Ir para slide ${i + 1}`);
+        dot.addEventListener('click', () => this.goToSlide(i));
+        this.dotsContainer.appendChild(dot);
+      }
+    },
+
+    updateCarousel() {
+      if (!this.track) return;
+      
+      const maxIndex = Math.max(0, this.totalCards - this.cardsVisible);
+      this.currentIndex = Math.min(this.currentIndex, maxIndex);
+      
+      const translateX = -(this.currentIndex * (this.cardWidth + 32)); // 32px = margin-right
+      this.track.style.transform = `translateX(${translateX}px)`;
+      
+      // Update navigation buttons
+      if (this.prevBtn) {
+        this.prevBtn.disabled = this.currentIndex === 0;
+      }
+      if (this.nextBtn) {
+        this.nextBtn.disabled = this.currentIndex >= maxIndex;
+      }
+      
+      // Update dots
+      if (this.dotsContainer) {
+        const dots = this.dotsContainer.querySelectorAll('.carousel-dot');
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('active', index === this.currentIndex);
+        });
+      }
+    },
+
+    goToSlide(index) {
+      this.currentIndex = index;
+      this.updateCarousel();
+      this.resetAutoPlay();
+    },
+
+    nextSlide() {
+      const maxIndex = Math.max(0, this.totalCards - this.cardsVisible);
+      if (this.currentIndex < maxIndex) {
+        this.currentIndex++;
+      } else {
+        this.currentIndex = 0; // Loop back to start
+      }
+      this.updateCarousel();
+    },
+
+    prevSlide() {
+      if (this.currentIndex > 0) {
+        this.currentIndex--;
+      } else {
+        this.currentIndex = Math.max(0, this.totalCards - this.cardsVisible); // Loop to end
+      }
+      this.updateCarousel();
+    },
+
+    bindEvents() {
+      if (this.nextBtn) {
+        this.nextBtn.addEventListener('click', () => {
+          this.nextSlide();
+          this.resetAutoPlay();
+        });
+      }
+      
+      if (this.prevBtn) {
+        this.prevBtn.addEventListener('click', () => {
+          this.prevSlide();
+          this.resetAutoPlay();
+        });
+      }
+
+      // Pause autoplay on hover
+      if (this.track) {
+        this.track.addEventListener('mouseenter', () => this.pauseAutoPlay());
+        this.track.addEventListener('mouseleave', () => this.startAutoPlay());
+      }
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        this.updateCardsVisible();
+        this.createDots();
+        this.updateCarousel();
+      });
+
+      // Touch events for mobile swipe
+      this.addTouchEvents();
+    },
+
+    addTouchEvents() {
+      if (!this.track) return;
+      
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+
+      this.track.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        this.pauseAutoPlay();
+      });
+
+      this.track.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+      });
+
+      this.track.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        
+        const diffX = startX - currentX;
+        const threshold = 50;
+        
+        if (Math.abs(diffX) > threshold) {
+          if (diffX > 0) {
+            this.nextSlide();
+          } else {
+            this.prevSlide();
+          }
+        }
+        
+        isDragging = false;
+        this.startAutoPlay();
+      });
+    },
+
+    startAutoPlay() {
+      this.pauseAutoPlay();
+      this.autoPlayInterval = setInterval(() => {
+        this.nextSlide();
+      }, 5000); // Change slide every 5 seconds
+    },
+
+    pauseAutoPlay() {
+      if (this.autoPlayInterval) {
+        clearInterval(this.autoPlayInterval);
+        this.autoPlayInterval = null;
+      }
+    },
+
+    resetAutoPlay() {
+      this.pauseAutoPlay();
+      this.startAutoPlay();
+    }
+  };
+
+  // Initialize reviews carousel
+  reviewsCarousel.init();
 });
