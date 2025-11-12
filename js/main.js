@@ -232,7 +232,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Contact form handling
   if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent default form submission
+      
       const submitBtn = this.querySelector('#submit-btn');
+      const formData = new FormData(this);
       
       // Show loading state
       submitBtn.classList.add('loading');
@@ -253,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       
       if (!isValid) {
-        e.preventDefault();
         submitBtn.classList.remove('loading');
         showFormMessage('Por favor, preencha todos os campos obrigatórios.', 'error', contactForm);
         return;
@@ -262,28 +264,53 @@ document.addEventListener('DOMContentLoaded', function() {
       // Email validation
       const emailField = this.querySelector('[type="email"]');
       if (emailField && !isValidEmail(emailField.value)) {
-        e.preventDefault();
         submitBtn.classList.remove('loading');
         emailField.style.borderColor = '#dc3545';
         emailField.style.borderWidth = '2px';
         showFormMessage('Por favor, insira um e-mail válido.', 'error', contactForm);
         return;
       }
+
+      // Submit to Formspree
+      fetch('https://formspree.io/f/movyxqku', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(formData))
+      })
+      .then(response => {
+        if (response.ok) {
+          submitBtn.classList.remove('loading');
+          showFormMessage('Mensagem enviada com sucesso!', 'success', contactForm);
+          this.reset();
+          // Optional: redirect to thank you page
+          setTimeout(() => {
+            window.location.href = 'obrigado.html';
+          }, 2000);
+        } else {
+          throw new Error('Erro no envio');
+        }
+      })
+      .catch((error) => {
+        submitBtn.classList.remove('loading');
+        showFormMessage('Erro ao enviar mensagem. Tente novamente.', 'error', contactForm);
+      });
     });
   }
 
   // Newsletter form handling
   if (newsletterForm) {
     newsletterForm.addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent default form submission
+      
       const submitBtn = this.querySelector('#newsletter-btn');
       const emailField = this.querySelector('[type="email"]');
+      const formData = new FormData(this);
       
       // Show loading state
       submitBtn.classList.add('loading');
       
       // Email validation
       if (!emailField.value.trim() || !isValidEmail(emailField.value)) {
-        e.preventDefault();
         submitBtn.classList.remove('loading');
         emailField.style.borderColor = '#dc3545';
         emailField.style.borderWidth = '2px';
@@ -293,6 +320,29 @@ document.addEventListener('DOMContentLoaded', function() {
         emailField.style.borderColor = '#28a745';
         emailField.style.borderWidth = '2px';
       }
+
+      // Submit to Formspree (mesmo endpoint, você pode criar outro se quiser separar)
+      fetch('https://formspree.io/f/movyxqku', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailField.value,
+          form_type: 'newsletter'
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          submitBtn.classList.remove('loading');
+          showFormMessage('Inscrição realizada com sucesso!', 'success', newsletterForm);
+          this.reset();
+        } else {
+          throw new Error('Erro no envio');
+        }
+      })
+      .catch((error) => {
+        submitBtn.classList.remove('loading');
+        showFormMessage('Erro ao fazer inscrição. Tente novamente.', 'error', newsletterForm);
+      });
     });
   }
 
