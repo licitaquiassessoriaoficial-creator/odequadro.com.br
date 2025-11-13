@@ -24,6 +24,7 @@
             <li><a href="index.html">Início</a></li>
             <li><a href="solucoes.html" class="active">Soluções</a></li>
             <li><a href="segmentos.html">Segmentos</a></li>
+            <li><a href="incorporadora.html">Incorporadora</a></li>
             <li><a href="certificacoes.html">Certificações</a></li>
             <li><a href="noticias.html">Notícias</a></li>
             <li><a href="contato.html">Contato</a></li>
@@ -37,74 +38,348 @@
     </header>
 
     <main>
-      <section class="page-hero">
+      <section class="solutions-hero">
         <div class="container">
-          <h1>Soluções</h1>
-          <p>Conheça nossas soluções integradas para o seu negócio</p>
+          <div class="hero-content">
+            <div class="hero-text">
+              <span class="hero-badge">Soluções Completas</span>
+              <h1>Transformamos desafios em <span class="text-primary">oportunidades</span></h1>
+              <p class="lead">Oferecemos soluções integradas e personalizadas para potencializar o crescimento do seu negócio com excelência e inovação.</p>
+              <div class="hero-stats">
+                <div class="stat-item">
+                  <span class="stat-number">25+</span>
+                  <span class="stat-label">Anos de Experiência</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">500+</span>
+                  <span class="stat-label">Projetos Executados</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">100%</span>
+                  <span class="stat-label">Qualidade Garantida</span>
+                </div>
+              </div>
+            </div>
+            <div class="hero-visual">
+              <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Equipe O de Quadro" />
+              </div>
+              <div class="floating-cards">
+                <div class="floating-card card-1">
+                  <div class="card-icon">👥</div>
+                  <span>RH Especializado</span>
+                </div>
+                <div class="floating-card card-2">
+                  <div class="card-icon">🏢</div>
+                  <span>Facilities</span>
+                </div>
+                <div class="floating-card card-3">
+                  <div class="card-icon">🏗️</div>
+                  <span>Construção</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="container section">
-        <div class="solutions-grid">
-          <div class="solution-card">
-            <div class="solution-icon">
-              <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Recursos Humanos Especializados" />
-            </div>
-            <h3>Soluções para mão de obra Especializada</h3>
-            <p>Especialista em recrutamento e seleção e fornecimento de profissionais de todos os níveis para diversos segmentos de mercado.</p>
-            <ul class="solution-features">
-              <li>Recrutamento e Seleção</li>
-              <li>Profissionais qualificados</li>
-              <li>Todos os níveis hierárquicos</li>
-              <li>Diversos segmentos</li>
-            </ul>
-            <a href="https://odequadro.com.br/service/servicos-administrativos-especializados/" class="btn">Saiba Mais</a>
+      <!-- Seção Overview -->
+      <section class="solutions-overview">
+        <div class="container">
+          <div class="section-header">
+            <h2>Nossas <span class="text-primary">Soluções</span></h2>
+            <p>Desenvolvemos soluções sob medida para cada necessidade do seu negócio</p>
           </div>
-
-          <div class="solution-card">
-            <div class="solution-icon">
-              <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Facilities Management" />
+          <div class="solutions-tabs">
+            <div class="tab-navigation">
+              <button class="tab-btn active" data-tab="rh">Recursos Humanos</button>
+              <button class="tab-btn" data-tab="facilities">Facilities</button>
+              <button class="tab-btn" data-tab="construcao">Construção</button>
+              <button class="tab-btn" data-tab="licitacoes">Licitações</button>
             </div>
-            <h3>Facilities Management</h3>
-            <p>Gestão integrada de facilities com foco na otimização de recursos e maximização da eficiência operacional.</p>
-            <ul class="solution-features">
-              <li>Gestão de instalações</li>
-              <li>Manutenção predial</li>
-              <li>Limpeza e conservação</li>
-              <li>Segurança patrimonial</li>
-            </ul>
-            <a href="https://odequadro.com.br/service/servico-de-recepcao/" class="btn">Saiba Mais</a>
+            
+            <div class="tab-content active" id="tab-rh">
+              <div class="solution-detailed">
+                <div class="solution-info">
+                  <div class="solution-badge">Especialistas em Pessoas</div>
+                  <h3>Soluções em Recursos Humanos Especializados</h3>
+                  <p class="solution-description">Conectamos talentos às oportunidades certas. Nossa expertise em recrutamento e seleção garante profissionais qualificados para impulsionar o crescimento da sua empresa.</p>
+                  
+                  <div class="solution-highlights">
+                    <div class="highlight-item">
+                      <div class="highlight-icon">🎯</div>
+                      <div class="highlight-content">
+                        <h4>Recrutamento Estratégico</h4>
+                        <p>Processo seletivo rigoroso e personalizado</p>
+                      </div>
+                    </div>
+                    <div class="highlight-item">
+                      <div class="highlight-icon">⭐</div>
+                      <div class="highlight-content">
+                        <h4>Profissionais Qualificados</h4>
+                        <p>Talentos especializados em diversos segmentos</p>
+                      </div>
+                    </div>
+                    <div class="highlight-item">
+                      <div class="highlight-icon">📈</div>
+                      <div class="highlight-content">
+                        <h4>Todos os Níveis</h4>
+                        <p>Do operacional ao executivo</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="solution-benefits">
+                    <h4>Benefícios Inclusos:</h4>
+                    <ul>
+                      <li>Análise de perfil comportamental</li>
+                      <li>Testes técnicos especializados</li>
+                      <li>Verificação de referências</li>
+                      <li>Garantia de substituição</li>
+                      <li>Acompanhamento pós-contratação</li>
+                    </ul>
+                  </div>
+                  
+                  <a href="servicos.html" class="btn btn-primary">Conhecer Serviços de RH</a>
+                </div>
+                <div class="solution-visual">
+                  <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Recursos Humanos Especializados" />
+                  <div class="stats-overlay">
+                    <div class="stat">
+                      <span class="stat-number">2000+</span>
+                      <span class="stat-label">Profissionais Alocados</span>
+                    </div>
+                    <div class="stat">
+                      <span class="stat-number">95%</span>
+                      <span class="stat-label">Taxa de Aprovação</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-content" id="tab-facilities">
+              <div class="solution-detailed">
+                <div class="solution-info">
+                  <div class="solution-badge">Gestão Inteligente</div>
+                  <h3>Facilities Management</h3>
+                  <p class="solution-description">Gestão integrada de facilities com tecnologia e expertise para otimizar recursos, reduzir custos e maximizar a eficiência operacional do seu ambiente corporativo.</p>
+                  
+                  <div class="solution-highlights">
+                    <div class="highlight-item">
+                      <div class="highlight-icon">🏢</div>
+                      <div class="highlight-content">
+                        <h4>Gestão Completa</h4>
+                        <p>Administração total das instalações</p>
+                      </div>
+                    </div>
+                    <div class="highlight-item">
+                      <div class="highlight-icon">🔧</div>
+                      <div class="highlight-content">
+                        <h4>Manutenção Preventiva</h4>
+                        <p>Evita problemas antes que aconteçam</p>
+                      </div>
+                    </div>
+                    <div class="highlight-item">
+                      <div class="highlight-icon">💰</div>
+                      <div class="highlight-content">
+                        <h4>Redução de Custos</h4>
+                        <p>Otimização de recursos e processos</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="solution-benefits">
+                    <h4>Serviços Inclusos:</h4>
+                    <ul>
+                      <li>Limpeza e conservação profissional</li>
+                      <li>Manutenção predial especializada</li>
+                      <li>Segurança patrimonial 24h</li>
+                      <li>Gestão de utilidades (água, luz, gás)</li>
+                      <li>Controle de acesso e portaria</li>
+                      <li>Jardinagem e paisagismo</li>
+                    </ul>
+                  </div>
+                  
+                  <a href="servicos.html" class="btn btn-primary">Conhecer Facilities</a>
+                </div>
+                <div class="solution-visual">
+                  <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Facilities Management" />
+                  <div class="stats-overlay">
+                    <div class="stat">
+                      <span class="stat-number">50+</span>
+                      <span class="stat-label">Edifícios Gerenciados</span>
+                    </div>
+                    <div class="stat">
+                      <span class="stat-number">30%</span>
+                      <span class="stat-label">Redução de Custos</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-content" id="tab-construcao">
+              <div class="solution-detailed">
+                <div class="solution-info">
+                  <div class="solution-badge">Construindo o Futuro</div>
+                  <h3>Soluções em Construção</h3>
+                  <p class="solution-description">Projetos personalizados de construção civil com foco em qualidade, sustentabilidade e inovação. Da concepção à entrega, transformamos suas ideias em realidade.</p>
+                  
+                  <div class="solution-highlights">
+                    <div class="highlight-item">
+                      <div class="highlight-icon">📐</div>
+                      <div class="highlight-content">
+                        <h4>Projetos Personalizados</h4>
+                        <p>Sob medida para suas necessidades</p>
+                      </div>
+                    </div>
+                    <div class="highlight-item">
+                      <div class="highlight-icon">🏗️</div>
+                      <div class="highlight-content">
+                        <h4>Gestão Completa</h4>
+                        <p>Do projeto à execução</p>
+                      </div>
+                    </div>
+                    <div class="highlight-item">
+                      <div class="highlight-icon">🌱</div>
+                      <div class="highlight-content">
+                        <h4>Sustentabilidade</h4>
+                        <p>Construção consciente e responsável</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="solution-benefits">
+                    <h4>Nossos Diferenciais:</h4>
+                    <ul>
+                      <li>Projetos arquitetônicos e estruturais</li>
+                      <li>Gestão total da obra</li>
+                      <li>Materiais de alta qualidade</li>
+                      <li>Prazos rigorosamente cumpridos</li>
+                      <li>Acompanhamento técnico especializado</li>
+                      <li>Garantia pós-obra</li>
+                    </ul>
+                  </div>
+                  
+                  <a href="incorporadora.html" class="btn btn-primary">Ver Empreendimentos</a>
+                </div>
+                <div class="solution-visual">
+                  <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Soluções em Construção" />
+                  <div class="stats-overlay">
+                    <div class="stat">
+                      <span class="stat-number">100+</span>
+                      <span class="stat-label">Obras Entregues</span>
+                    </div>
+                    <div class="stat">
+                      <span class="stat-number">98%</span>
+                      <span class="stat-label">Satisfação dos Clientes</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-content" id="tab-licitacoes">
+              <div class="solution-detailed">
+                <div class="solution-info">
+                  <div class="solution-badge highlight-badge">Regulamentação é coisa séria</div>
+                  <h3>Assessoria em Licitações</h3>
+                  <p class="solution-description">Expertise comprovada em licitações públicas. Nossa equipe especializada acompanha sua empresa em todo o processo, desde a análise do edital até a execução do contrato.</p>
+                  
+                  <div class="solution-highlights">
+                    <div class="highlight-item">
+                      <div class="highlight-icon">📋</div>
+                      <div class="highlight-content">
+                        <h4>Análise Especializada</h4>
+                        <p>Estudo detalhado de editais</p>
+                      </div>
+                    </div>
+                    <div class="highlight-item">
+                      <div class="highlight-icon">📝</div>
+                      <div class="highlight-content">
+                        <h4>Propostas Técnicas</h4>
+                        <p>Documentação completa e precisa</p>
+                      </div>
+                    </div>
+                    <div class="highlight-item">
+                      <div class="highlight-icon">⚖️</div>
+                      <div class="highlight-content">
+                        <h4>Conformidade Total</h4>
+                        <p>100% dentro da legislação</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="solution-benefits">
+                    <h4>Nossos Serviços:</h4>
+                    <ul>
+                      <li>Análise e interpretação de editais</li>
+                      <li>Elaboração de propostas técnicas</li>
+                      <li>Documentação legal completa</li>
+                      <li>Acompanhamento do processo</li>
+                      <li>Recursos e impugnações</li>
+                      <li>Gestão de contratos públicos</li>
+                    </ul>
+                  </div>
+                  
+                  <a href="contato.html" class="btn btn-primary">Solicitar Consultoria</a>
+                </div>
+                <div class="solution-visual">
+                  <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Assessoria em Licitações" />
+                  <div class="stats-overlay">
+                    <div class="stat">
+                      <span class="stat-number">300+</span>
+                      <span class="stat-label">Licitações Ganhas</span>
+                    </div>
+                    <div class="stat">
+                      <span class="stat-number">85%</span>
+                      <span class="stat-label">Taxa de Sucesso</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div class="solution-card">
-            <div class="solution-icon">
-              <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Soluções em Construção" />
-            </div>
-            <h3>Soluções em Construção</h3>
-            <p>Projetos personalizados para construção de empreendimentos imobiliários com qualidade e inovação.</p>
-            <ul class="solution-features">
-              <li>Projetos personalizados</li>
-              <li>Gestão de obras</li>
-              <li>Empreendimentos imobiliários</li>
-              <li>Qualidade garantida</li>
-            </ul>
-            <a href="https://odequadro.com.br/service/construcoes" class="btn">Saiba Mais</a>
+        </div>
+      </section>
+      
+      <!-- Seção Processo -->
+      <section class="process-section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Nosso <span class="text-primary">Processo</span></h2>
+            <p>Uma metodologia comprovada para garantir os melhores resultados</p>
           </div>
-
-          <div class="solution-card">
-            <div class="solution-icon">
-              <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Assessoria em Licitações" />
+          <div class="process-steps">
+            <div class="process-step">
+              <div class="step-number">01</div>
+              <div class="step-content">
+                <h3>Análise e Diagnóstico</h3>
+                <p>Compreendemos suas necessidades e desafios específicos para desenvolver a solução ideal.</p>
+              </div>
             </div>
-            <h3>Assessoria em Licitações</h3>
-            <p>Expertise em geração de negócios públicos, seja em produtos ou serviços para sua empresa.</p>
-            <ul class="solution-features">
-              <li>Análise de editais</li>
-              <li>Elaboração de propostas</li>
-              <li>Acompanhamento processual</li>
-              <li>Regulamentação especializada</li>
-            </ul>
-            <a href="https://odequadro.com.br/service/condominio-o-de-quadro/" class="btn">Saiba Mais</a>
-            <div class="highlight">Regulamentação é coisa séria</div>
+            <div class="process-step">
+              <div class="step-number">02</div>
+              <div class="step-content">
+                <h3>Planejamento Estratégico</h3>
+                <p>Criamos um plano detalhado com cronograma, recursos e indicadores de sucesso.</p>
+              </div>
+            </div>
+            <div class="process-step">
+              <div class="step-number">03</div>
+              <div class="step-content">
+                <h3>Implementação</h3>
+                <p>Executamos a solução com acompanhamento contínuo e ajustes quando necessário.</p>
+              </div>
+            </div>
+            <div class="process-step">
+              <div class="step-number">04</div>
+              <div class="step-content">
+                <h3>Monitoramento</h3>
+                <p>Acompanhamos os resultados e garantimos a melhoria contínua dos processos.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
