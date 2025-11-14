@@ -2,12 +2,17 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static(__dirname));
+
+// Log all requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
+  next();
+});
 
 // CORS para desenvolvimento
 app.use((req, res, next) => {
@@ -145,14 +150,12 @@ app.use('*', (req, res) => {
   res.redirect('/');
 });
 
-// Iniciar servidor - Railway precisa de 0.0.0.0
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌐 Host: 0.0.0.0:${PORT}`);
-  console.log(`✅ Railway ready!`);
-  console.log(`📝 API endpoints:`);
-  console.log(`   GET /api/health`);
-  console.log(`   POST /api/contato`);
+// Start server - Railway must use 0.0.0.0
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on ${HOST}:${PORT}`);
+  console.log(`Railway deployment ready!`);
 });
 
 module.exports = app;
