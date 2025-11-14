@@ -1,47 +1,14 @@
 {
   "name": "odequadro-website",
   "version": "1.0.0",
-  "description": "Recreação do site oficial da O de Quadro - Centro de negócios multiespecialistas",
-  "main": "index.html",
+  "description": "Site oficial da O de Quadro",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "build": "echo 'Static site - no build needed'",
-    "lint": "echo 'Linting not configured yet'"
+    "start": "node server.js"
   },
-  "keywords": [
-    "website",
-    "html",
-    "css",
-    "javascript",
-    "responsive",
-    "business"
-  ],
-  "author": "O de Quadro Recreation",
-  "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "mysql2": "^3.6.5",
-    "sqlite3": "^5.1.6",
-    "sqlite": "^5.1.1",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "express": "^4.18.2"
   },
-  "devDependencies": {
-    "serve": "^14.2.1",
-    "live-server": "^1.2.2",
-    "nodemon": "^3.0.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "local"
-  },
-  "homepage": ".",
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  "author": "O de Quadro",
+  "license": "MIT"
 }
