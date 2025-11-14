@@ -51,13 +51,14 @@ async function connectDB() {
     
     // Initialize tables
     await initializeTables();
+    return true;
   } catch (error) {
     console.error('Database connection failed:', error.message);
     console.log('Available environment variables:');
     console.log('MYSQL_HOST:', process.env.MYSQL_HOST);
     console.log('MYSQL_USER:', process.env.MYSQL_USER);
     console.log('MYSQL_DATABASE:', process.env.MYSQL_DATABASE);
-    throw error; // Re-throw to stop server startup
+    return false;
   }
 }
 
@@ -639,19 +640,32 @@ app.use((err, req, res, next) => {
 
 // Start server only after database connection
 async function startServer() {
-  try {
-    console.log('🔄 Initializing database connection...');
-    await connectDB();
-    
+  console.log('🔄 Starting server initialization...');
+  
+  const dbConnected = await connectDB();
+  
+  if (dbConnected) {
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log('✅ Database connected and ready');
       console.log('🌐 API endpoints available at /api/*');
-      console.log('🎯 Ready for requests!');
     });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error.message);
-    process.exit(1);
+  } else {
+    console.log('⚠️ Server starting without database connection');
+    console.log('Some endpoints may not work until database is available');
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT} (DB pending)`);
+      console.log('🔄 Will retry database connection...');
+    });
+    
+    // Retry connection every 10 seconds
+    setInterval(async () => {
+      if (!db) {
+        console.log('🔄 Retrying database connection...');
+        await connectDB();
+      }
+    }, 10000);
   }
 }
 
