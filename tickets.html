@@ -802,8 +802,39 @@
           e.preventDefault();
           
           const formData = new FormData(this);
+          const cpf = formData.get('cpf').replace(/\D/g, '');
+          const nome = formData.get('nome').trim();
+          const email = formData.get('email').trim();
           const senha = formData.get('senha');
           const confirmSenha = formData.get('confirmSenha');
+          const role = formData.get('role');
+          const setor = formData.get('setor');
+          
+          // Validações
+          if (!cpf || cpf.length !== 11) {
+            alert('CPF deve ter 11 dígitos');
+            return;
+          }
+          
+          if (!nome || nome.length < 2) {
+            alert('Nome deve ter pelo menos 2 caracteres');
+            return;
+          }
+          
+          if (!email || !email.includes('@')) {
+            alert('Digite um e-mail válido');
+            return;
+          }
+          
+          if (!role) {
+            alert('Selecione o tipo de usuário');
+            return;
+          }
+          
+          if (!setor) {
+            alert('Selecione o setor');
+            return;
+          }
           
           if (senha !== confirmSenha) {
             alert('As senhas não coincidem');
@@ -816,9 +847,9 @@
           }
           
           const userData = {
-            cpf: formData.get('cpf'),
-            nome: formData.get('nome'),
-            email: formData.get('email'),
+            cpf: formData.get('cpf').replace(/\D/g, ''), // Remove máscara do CPF
+            nome: formData.get('nome').trim(),
+            email: formData.get('email').trim(),
             senha: senha,
             role: formData.get('role'),
             setor: formData.get('setor')

@@ -203,26 +203,52 @@ app.post('/api/login', async (req, res) => {
 // Register user (for first access and admin)
 app.post('/api/register', async (req, res) => {
   try {
+    console.log('Register request received:', req.body);
 
     const { cpf, nome, email, senha, role, setor } = req.body;
 
+    // Validate required fields
+    if (!cpf || !nome || !email || !senha || !role || !setor) {
+      console.log('Missing required fields:', { cpf: !!cpf, nome: !!nome, email: !!email, senha: !!senha, role: !!role, setor: !!setor });
+      return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    // Clean CPF (remove dots and dashes)
+    const cleanCPF = cpf.replace(/\D/g, '');
+    
+    if (cleanCPF.length !== 11) {
+      return res.status(400).json({ error: 'CPF deve ter 11 dígitos' });
+    }
+
     // Check if user already exists
-    const [existingUsers] = await db.execute('SELECT id FROM users WHERE cpf = ?', [cpf]);
+    const [existingUsers] = await db.execute('SELECT id FROM users WHERE cpf = ?', [cleanCPF]);
     if (existingUsers.length > 0) {
-      return res.status(400).json({ error: 'Usuário já cadastrado' });
+      console.log('User already exists with CPF:', cleanCPF);
+      return res.status(400).json({ error: 'Usuário já cadastrado com este CPF' });
+    }
+
+    // Check if email already exists
+    const [existingEmails] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
+    if (existingEmails.length > 0) {
+      console.log('Email already exists:', email);
+      return res.status(400).json({ error: 'E-mail já cadastrado no sistema' });
     }
 
     const hashedPassword = await bcrypt.hash(senha, 10);
 
+    console.log('Inserting user:', { cpf: cleanCPF, nome, email, role, setor });
+
     await db.execute(`
       INSERT INTO users (cpf, nome, email, senha, role, setor) 
       VALUES (?, ?, ?, ?, ?, ?)
-    `, [cpf, nome, email, hashedPassword, role, setor]);
+    `, [cleanCPF, nome, email, hashedPassword, role, setor]);
 
+    console.log('User registered successfully:', nome);
     res.json({ message: 'Usuário cadastrado com sucesso' });
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    console.error('Error details:', error.message);
+    res.status(500).json({ error: 'Erro interno do servidor: ' + error.message });
   }
 });
 
