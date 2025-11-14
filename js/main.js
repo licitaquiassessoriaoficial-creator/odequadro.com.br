@@ -659,4 +659,297 @@ document.addEventListener('DOMContentLoaded', function() {
   initTabs();
   initFilters();
   initSmoothScroll();
+  
+  // ===== MODERN INTERACTIVE FEATURES =====
+  
+  // Particles Animation
+  function initParticles() {
+    const canvas = document.getElementById('particlesCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const particleCount = 50;
+    
+    // Resize canvas
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Particle class
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.radius = Math.random() * 2 + 1;
+        this.opacity = Math.random() * 0.5 + 0.2;
+      }
+      
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      
+      draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#2EB85C';
+        ctx.fill();
+      }
+    }
+    
+    // Initialize particles
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+    
+    // Animation loop
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+      
+      // Draw connections
+      particles.forEach((particle, i) => {
+        particles.slice(i + 1).forEach(otherParticle => {
+          const dx = particle.x - otherParticle.x;
+          const dy = particle.y - otherParticle.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 100) {
+            ctx.globalAlpha = (100 - distance) / 100 * 0.1;
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(otherParticle.x, otherParticle.y);
+            ctx.strokeStyle = '#2EB85C';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        });
+      });
+      
+      requestAnimationFrame(animate);
+    }
+    
+    animate();
+  }
+  
+  // Counter Animation
+  function animateCounters() {
+    const counters = document.querySelectorAll('.counter');
+    
+    counters.forEach(counter => {
+      const target = parseInt(counter.closest('.modern-stat').dataset.count) || 0;
+      const increment = target / 100;
+      let count = 0;
+      
+      const updateCounter = () => {
+        if (count < target) {
+          count += increment;
+          counter.textContent = Math.ceil(count);
+          setTimeout(updateCounter, 20);
+        } else {
+          counter.textContent = target;
+        }
+      };
+      
+      // Start animation when element is visible
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            updateCounter();
+            observer.unobserve(entry.target);
+          }
+        });
+      });
+      
+      observer.observe(counter);
+    });
+  }
+  
+  // Enhanced Scroll Effects
+  function initEnhancedScrollEffects() {
+    let ticking = false;
+    
+    function updateScrollEffects() {
+      const scrolled = window.pageYOffset;
+      const windowHeight = window.innerHeight;
+      
+      // Parallax for floating shapes
+      const shapes = document.querySelectorAll('.shape');
+      shapes.forEach((shape, index) => {
+        const speed = 0.5 + (index * 0.1);
+        shape.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
+      });
+      
+      // Hero content parallax
+      const heroContent = document.querySelector('.hero-content-modern');
+      if (heroContent) {
+        heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
+      }
+      
+      // Section reveal animations
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const isVisible = rect.top < windowHeight && rect.bottom > 0;
+        
+        if (isVisible) {
+          section.classList.add('animate-in');
+        }
+      });
+      
+      ticking = false;
+    }
+    
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateScrollEffects);
+        ticking = true;
+      }
+    });
+  }
+  
+  // Interactive Button Effects
+  function initInteractiveButtons() {
+    const modernBtns = document.querySelectorAll('.modern-btn');
+    
+    modernBtns.forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        btn.style.setProperty('--x', x + 'px');
+        btn.style.setProperty('--y', y + 'px');
+      });
+    });
+  }
+  
+  // Loading Animation
+  function initLoadingAnimation() {
+    const loader = document.createElement('div');
+    loader.className = 'page-loader';
+    loader.innerHTML = `
+      <div class="loader-content">
+        <div class="loader-logo">
+          <div class="loader-circle"></div>
+          <span>O de Quadro</span>
+        </div>
+        <div class="loader-progress">
+          <div class="progress-bar"></div>
+        </div>
+      </div>
+    `;
+    
+    // Add loader styles
+    const loaderStyles = `
+      .page-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      
+      .loader-content {
+        text-align: center;
+        color: white;
+      }
+      
+      .loader-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+      
+      .loader-circle {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(46, 184, 92, 0.3);
+        border-top: 3px solid #2EB85C;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      .loader-progress {
+        width: 200px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      
+      .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #2EB85C, #27AE60);
+        border-radius: 2px;
+        animation: progress 2s ease-in-out forwards;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      @keyframes progress {
+        0% { width: 0%; }
+        100% { width: 100%; }
+      }
+      
+      .page-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+    `;
+    
+    const style = document.createElement('style');
+    style.textContent = loaderStyles;
+    document.head.appendChild(style);
+    document.body.appendChild(loader);
+    
+    // Hide loader when page is loaded
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        document.body.classList.add('loaded');
+        setTimeout(() => {
+          loader.remove();
+        }, 500);
+      }, 1000);
+    });
+  }
+  
+  // Initialize all modern features
+  if (document.querySelector('.modern-hero')) {
+    initParticles();
+    animateCounters();
+    initEnhancedScrollEffects();
+    initInteractiveButtons();
+    initLoadingAnimation();
+  }
 });

@@ -38,35 +38,76 @@
     </header>
 
     <main>
-      <section class="hero">
+      <!-- Animated Background Particles -->
+      <div class="particles-container">
+        <canvas id="particlesCanvas"></canvas>
+      </div>
+
+      <section class="hero modern-hero">
         <div class="hero-background">
           <video autoplay muted loop class="hero-video" poster="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80">
             <source src="background.MP4" type="video/mp4">
             <source src="https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4" type="video/mp4">
             <!-- Fallback para navegadores que não suportam vídeo -->
           </video>
-          <div class="hero-overlay"></div>
+          <div class="hero-overlay modern-overlay"></div>
+          
+          <!-- Floating geometric shapes -->
+          <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+          </div>
         </div>
+        
         <div class="container hero-inner">
-          <h1>Centro de negócios multiespecialistas</h1>
-          <p>
-            Com experiência no mercado de serviços de negócios diversificados, a
-            incorporação se destaca na atuação e gerenciamento de projetos,
-            engenharia naval e petróleo e gás.
-          </p>
-          <div class="stats">
-            <div class="stat">
-              <span class="number">14</span>
-              <span class="label">anos crescendo com nossos clientes</span>
+          <div class="hero-content-modern">
+            <div class="tech-badge">
+              <span class="pulse-dot"></span>
+              Tecnologia & Inovação
             </div>
-            <div class="stat">
-              <span class="text">Sólida experiência no segmento privado e público</span>
+            
+            <h1 class="glitch-text" data-text="Centro de negócios multiespecialistas">
+              Centro de negócios multiespecialistas
+            </h1>
+            
+            <p class="typewriter-text">
+              Com experiência no mercado de serviços de negócios diversificados, a
+              incorporação se destaca na atuação e gerenciamento de projetos,
+              engenharia naval e petróleo e gás.
+            </p>
+            
+            <div class="stats modern-stats">
+              <div class="stat modern-stat" data-count="14">
+                <div class="stat-bg-effect"></div>
+                <span class="number counter">0</span>
+                <span class="label">anos crescendo com nossos clientes</span>
+              </div>
+              <div class="stat modern-stat">
+                <div class="stat-bg-effect"></div>
+                <span class="text">Sólida experiência no segmento privado e público</span>
+              </div>
+              <div class="stat modern-stat">
+                <div class="stat-bg-effect"></div>
+                <span class="text">Unidades nas principais regiões do país</span>
+              </div>
             </div>
-            <div class="stat">
-              <span class="text">Unidades nas principais regiões do país</span>
+            
+            <div class="hero-cta">
+              <a class="btn modern-btn" href="quem-somos.html">
+                <span class="btn-text">Saiba mais</span>
+                <span class="btn-bg"></span>
+                <div class="btn-particles"></div>
+              </a>
+              <div class="scroll-indicator">
+                <div class="mouse">
+                  <div class="wheel"></div>
+                </div>
+                <span>Role para descobrir</span>
+              </div>
             </div>
           </div>
-          <a class="btn" href="quem-somos.html">Saiba mais</a>
         </div>
       </section>
 
