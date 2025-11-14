@@ -552,6 +552,15 @@ app.get('/api/tickets/export', authenticateToken, async (req, res) => {
   }
 });
 
+// Test route for API connection
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'API is working',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Serve main page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

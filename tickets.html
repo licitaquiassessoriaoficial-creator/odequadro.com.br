@@ -642,11 +642,20 @@
         
         if (savedToken && savedUser) {
           authToken = savedToken;
-          currentUser = JSON.parse(savedUser);
-          showDashboard();
-          loadTickets();
-          loadDashboardStats();
+          try {
+            currentUser = JSON.parse(savedUser);
+            showDashboard();
+            loadTickets();
+            loadDashboardStats();
+          } catch (error) {
+            console.error('Error parsing saved user data:', error);
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+          }
         }
+        
+        // Add connection test
+        testConnection();
       });
 
       function showDashboard() {
@@ -1089,6 +1098,23 @@
         } catch (error) {
           console.error('Update status error:', error);
           alert('Erro de conexão');
+        }
+      }
+      
+      // Test API connection
+      async function testConnection() {
+        try {
+          const response = await fetch('/api/test', {
+            method: 'GET'
+          });
+          
+          if (!response.ok) {
+            console.log('API connection test failed');
+          } else {
+            console.log('API connection OK');
+          }
+        } catch (error) {
+          console.error('API connection error:', error);
         }
       }
     </script>
