@@ -437,6 +437,73 @@ app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
   }
 });
 
+// Password reset verification
+app.post('/api/password-reset/verify', async (req, res) => {
+  try {
+    const { cpf, role } = req.body;
+
+    const [users] = await db.execute(
+      'SELECT id, cpf, nome, email, setor, role FROM users WHERE cpf = ? AND role = ?',
+      [cpf, role]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    const user = users[0];
+    res.json({ 
+      message: 'Usuário encontrado',
+      user: {
+        id: user.id,
+        cpf: user.cpf,
+        nome: user.nome,
+        email: user.email,
+        setor: user.setor,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Password reset verification error:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// Password reset update
+app.post('/api/password-reset/update', async (req, res) => {
+  try {
+    const { cpf, role, newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: 'Senha deve ter pelo menos 6 caracteres' });
+    }
+
+    // Verify user exists
+    const [users] = await db.execute(
+      'SELECT id FROM users WHERE cpf = ? AND role = ?',
+      [cpf, role]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password
+    await db.execute(
+      'UPDATE users SET senha = ? WHERE cpf = ? AND role = ?',
+      [hashedPassword, cpf, role]
+    );
+
+    res.json({ message: 'Senha atualizada com sucesso' });
+  } catch (error) {
+    console.error('Password reset update error:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
 // Export tickets
 app.get('/api/tickets/export', authenticateToken, async (req, res) => {
   try {

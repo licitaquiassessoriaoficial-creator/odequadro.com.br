@@ -6402,6 +6402,140 @@ html {
   min-height: 80vh;
 }
 
+/* Password Reset Section */
+.ticket-reset {
+  padding: 60px 0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 80vh;
+}
+
+.reset-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+}
+
+.reset-card {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 450px;
+}
+
+.reset-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.reset-header h2 {
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.reset-header p {
+  color: #666;
+  margin: 0;
+}
+
+.reset-form .form-group,
+.verification-form .form-group {
+  margin-bottom: 20px;
+}
+
+.reset-form label,
+.verification-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.reset-form input,
+.reset-form select,
+.verification-form input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #f0f0f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.reset-form input:focus,
+.reset-form select:focus,
+.verification-form input:focus {
+  outline: none;
+  border-color: #2EB85C;
+}
+
+.reset-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.reset-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+}
+
+.reset-help {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.reset-help a {
+  color: #2EB85C;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.reset-help a:hover {
+  text-decoration: underline;
+}
+
+.user-verification {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border-left: 4px solid #2EB85C;
+}
+
+.user-verification h4 {
+  color: #1a1a1a;
+  margin: 0 0 15px 0;
+}
+
+.user-verification p {
+  margin: 8px 0;
+  color: #555;
+}
+
+.verification-note {
+  font-style: italic;
+  color: #666 !important;
+  font-size: 0.9rem;
+  margin-top: 15px !important;
+}
+
 .register-container {
   display: flex;
   justify-content: center;

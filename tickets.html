@@ -98,7 +98,86 @@
 
               <div class="login-help">
                 <p><strong>Primeira vez?</strong> Sua senha inicial é os últimos 4 dígitos do seu CPF.</p>
-                <p><strong>Esqueceu a senha?</strong> Procure o Departamento Pessoal para resetar.</p>
+                <p><strong>Esqueceu a senha?</strong> <a href="#" onclick="showPasswordReset()">Clique aqui para redefinir</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Password Reset Section (Hidden initially) -->
+      <section class="ticket-reset dashboard-hidden" id="resetSection">
+        <div class="container">
+          <div class="reset-container">
+            <div class="reset-card">
+              <div class="reset-header">
+                <h2>Redefinir Senha</h2>
+                <p>Digite seu CPF e responda às perguntas de segurança</p>
+              </div>
+              
+              <form class="reset-form" id="resetForm">
+                <div class="form-group">
+                  <label for="resetCPF">CPF</label>
+                  <input type="text" id="resetCPF" name="cpf" placeholder="000.000.000-00" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="resetRole">Tipo de Usuário</label>
+                  <select id="resetRole" name="role" required>
+                    <option value="">Selecione seu tipo</option>
+                    <option value="colaborador">Colaborador</option>
+                    <option value="gestor">Gestor</option>
+                    <option value="dp">Departamento Pessoal</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="reset-btn">
+                  <i class="fas fa-search"></i>
+                  Verificar Dados
+                </button>
+              </form>
+
+              <div class="reset-help">
+                <p><a href="#" onclick="backToLogin()">← Voltar ao Login</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Password Reset Verification Section (Hidden initially) -->
+      <section class="ticket-reset dashboard-hidden" id="resetVerificationSection">
+        <div class="container">
+          <div class="reset-container">
+            <div class="reset-card">
+              <div class="reset-header">
+                <h2>Verificação de Segurança</h2>
+                <p>Confirme seus dados para redefinir a senha</p>
+              </div>
+              
+              <div class="verification-info" id="verificationInfo">
+                <!-- Dados do usuário serão preenchidos aqui -->
+              </div>
+              
+              <form class="verification-form" id="verificationForm">
+                <div class="form-group">
+                  <label for="newPassword">Nova Senha</label>
+                  <input type="password" id="newPassword" name="newPassword" placeholder="Mínimo 6 caracteres" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="confirmNewPassword">Confirmar Nova Senha</label>
+                  <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
+                </div>
+
+                <button type="submit" class="reset-btn">
+                  <i class="fas fa-key"></i>
+                  Redefinir Senha
+                </button>
+              </form>
+
+              <div class="reset-help">
+                <p><a href="#" onclick="backToLogin()">← Voltar ao Login</a></p>
               </div>
             </div>
           </div>
@@ -365,6 +444,7 @@
       let authToken = null;
       let currentUserCPF = null;
       let currentUserRole = null;
+      let resetUserData = null;
       const API_BASE = '/api';
 
       // Login functionality
@@ -421,6 +501,84 @@
             }
           } catch (error) {
             console.error('Login error:', error);
+            alert('Erro de conexão');
+          }
+        });
+
+        // Password reset form
+        const resetForm = document.getElementById('resetForm');
+        resetForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(this);
+          const cpf = formData.get('cpf');
+          const role = formData.get('role');
+
+          try {
+            const response = await fetch(`${API_BASE}/password-reset/verify`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ cpf, role })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              resetUserData = data.user;
+              showPasswordVerification();
+            } else {
+              alert(data.error || 'Usuário não encontrado');
+            }
+          } catch (error) {
+            console.error('Reset verification error:', error);
+            alert('Erro de conexão');
+          }
+        });
+
+        // Password verification form
+        const verificationForm = document.getElementById('verificationForm');
+        verificationForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(this);
+          const newPassword = formData.get('newPassword');
+          const confirmNewPassword = formData.get('confirmNewPassword');
+          
+          if (newPassword !== confirmNewPassword) {
+            alert('As senhas não coincidem');
+            return;
+          }
+          
+          if (newPassword.length < 6) {
+            alert('A senha deve ter pelo menos 6 caracteres');
+            return;
+          }
+
+          try {
+            const response = await fetch(`${API_BASE}/password-reset/update`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ 
+                cpf: resetUserData.cpf,
+                role: resetUserData.role,
+                newPassword: newPassword
+              })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              alert('Senha redefinida com sucesso! Agora você pode fazer login com a nova senha.');
+              backToLogin();
+            } else {
+              alert(data.error || 'Erro ao redefinir senha');
+            }
+          } catch (error) {
+            console.error('Password update error:', error);
             alert('Erro de conexão');
           }
         });
@@ -527,6 +685,42 @@
       function showRegisterSection() {
         document.getElementById('loginSection').classList.add('dashboard-hidden');
         document.getElementById('registerSection').classList.remove('dashboard-hidden');
+      }
+
+      function showPasswordReset() {
+        document.getElementById('loginSection').classList.add('dashboard-hidden');
+        document.getElementById('resetSection').classList.remove('dashboard-hidden');
+      }
+
+      function showPasswordVerification() {
+        document.getElementById('resetSection').classList.add('dashboard-hidden');
+        document.getElementById('resetVerificationSection').classList.remove('dashboard-hidden');
+        
+        // Mostrar dados do usuário para confirmação
+        const verificationInfo = document.getElementById('verificationInfo');
+        verificationInfo.innerHTML = `
+          <div class="user-verification">
+            <h4>Confirme seus dados:</h4>
+            <p><strong>Nome:</strong> ${resetUserData.nome}</p>
+            <p><strong>Email:</strong> ${resetUserData.email}</p>
+            <p><strong>Setor:</strong> ${resetUserData.setor || 'Não informado'}</p>
+            <p class="verification-note">Se estes dados estão corretos, você pode redefinir sua senha abaixo.</p>
+          </div>
+        `;
+      }
+
+      function backToLogin() {
+        // Limpar formulários
+        document.getElementById('resetForm').reset();
+        document.getElementById('verificationForm').reset();
+        
+        // Esconder todas as seções e mostrar login
+        document.getElementById('resetSection').classList.add('dashboard-hidden');
+        document.getElementById('resetVerificationSection').classList.add('dashboard-hidden');
+        document.getElementById('registerSection').classList.add('dashboard-hidden');
+        document.getElementById('loginSection').classList.remove('dashboard-hidden');
+        
+        resetUserData = null;
       }
 
       function logout() {
