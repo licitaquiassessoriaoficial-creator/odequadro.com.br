@@ -16,24 +16,35 @@ app.use(express.static('.'));
 
 // Database connection
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'odequadro_tickets',
-  port: process.env.DB_PORT || 3306
+  host: process.env.MYSQL_HOST || process.env.DB_HOST || 'localhost',
+  user: process.env.MYSQL_USER || process.env.DB_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD || '',
+  database: process.env.MYSQL_DATABASE || process.env.DB_NAME || 'railway',
+  port: process.env.MYSQL_PORT || process.env.DB_PORT || 3306
 };
 
 let db;
 
 async function connectDB() {
   try {
+    console.log('Attempting to connect to database with config:', {
+      host: dbConfig.host,
+      user: dbConfig.user,
+      database: dbConfig.database,
+      port: dbConfig.port
+    });
+    
     db = await mysql.createConnection(dbConfig);
-    console.log('Connected to MySQL database');
+    console.log('Connected to MySQL database successfully');
     
     // Initialize tables
     await initializeTables();
   } catch (error) {
-    console.error('Database connection failed:', error);
+    console.error('Database connection failed:', error.message);
+    console.log('Available environment variables:');
+    console.log('MYSQL_HOST:', process.env.MYSQL_HOST);
+    console.log('MYSQL_USER:', process.env.MYSQL_USER);
+    console.log('MYSQL_DATABASE:', process.env.MYSQL_DATABASE);
   }
 }
 
@@ -398,10 +409,10 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log('Attempting database connection...');
+  connectDB();
 });
 
 module.exports = app;
