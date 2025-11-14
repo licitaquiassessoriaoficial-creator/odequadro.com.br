@@ -513,7 +513,7 @@
       let currentUserCPF = null;
       let currentUserRole = null;
       let resetUserData = null;
-      const API_BASE = '/api';
+      const API_BASE = 'https://web-production-b4f40.up.railway.app/api';
 
       // Função para aplicar máscara de CPF
       function applyCPFMask(input) {
@@ -1401,7 +1401,7 @@
       // Test API connection
       async function testConnection() {
         try {
-          const response = await fetch('/api/test', {
+          const response = await fetch(`${API_BASE}/test`, {
             method: 'GET'
           });
           
