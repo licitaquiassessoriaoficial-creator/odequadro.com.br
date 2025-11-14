@@ -37,6 +37,10 @@ async function connectDB() {
     db = await mysql.createConnection(dbConfig);
     console.log('Connected to MySQL database successfully');
     
+    // Test connection
+    await db.execute('SELECT 1');
+    console.log('Database connection test successful');
+    
     // Initialize tables
     await initializeTables();
   } catch (error) {
@@ -45,6 +49,24 @@ async function connectDB() {
     console.log('MYSQL_HOST:', process.env.MYSQL_HOST);
     console.log('MYSQL_USER:', process.env.MYSQL_USER);
     console.log('MYSQL_DATABASE:', process.env.MYSQL_DATABASE);
+    
+    // Retry connection after 5 seconds
+    setTimeout(connectDB, 5000);
+  }
+}
+
+// Ensure database connection before executing queries
+async function ensureConnection() {
+  if (!db) {
+    console.log('Database not connected, attempting to reconnect...');
+    await connectDB();
+  }
+  
+  try {
+    await db.execute('SELECT 1');
+  } catch (error) {
+    console.log('Connection lost, reconnecting...');
+    await connectDB();
   }
 }
 
@@ -147,6 +169,9 @@ const authenticateToken = (req, res, next) => {
 // Login
 app.post('/api/login', async (req, res) => {
   try {
+    // Ensure database connection
+    await ensureConnection();
+    
     const { cpf, senha, role } = req.body;
 
     const [users] = await db.execute(
@@ -204,6 +229,9 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/register', async (req, res) => {
   try {
     console.log('Register request received:', req.body);
+    
+    // Ensure database connection
+    await ensureConnection();
 
     const { cpf, nome, email, senha, role, setor } = req.body;
 
@@ -255,6 +283,8 @@ app.post('/api/register', async (req, res) => {
 // Create ticket
 app.post('/api/tickets', authenticateToken, async (req, res) => {
   try {
+    await ensureConnection();
+    
     const { categoria, prioridade, assunto, descricao } = req.body;
     const numero = generateTicketNumber();
 
@@ -279,6 +309,8 @@ app.post('/api/tickets', authenticateToken, async (req, res) => {
 // Get tickets
 app.get('/api/tickets', authenticateToken, async (req, res) => {
   try {
+    await ensureConnection();
+    
     const { status, categoria } = req.query;
     let query = `
       SELECT t.*, u.nome as solicitante_nome, u.setor,
@@ -364,6 +396,8 @@ app.get('/api/tickets/:id', authenticateToken, async (req, res) => {
 // Dashboard statistics
 app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
   try {
+    await ensureConnection();
+    
     let whereClause = '';
     let params = [];
 
@@ -585,6 +619,26 @@ app.get('/api/test', (req, res) => {
     message: 'API is working',
     timestamp: new Date().toISOString()
   });
+});
+
+// Health check route
+app.get('/api/health', async (req, res) => {
+  try {
+    await ensureConnection();
+    await db.execute('SELECT 1');
+    res.json({
+      status: 'OK',
+      database: 'Connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'Error',
+      database: 'Disconnected',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Serve main page
