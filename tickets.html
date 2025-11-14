@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sistema de Tickets - O de Quadro</title>
+    <meta name="description" content="Sistema interno para abertura e acompanhamento de tickets entre colaboradores, departamento pessoal e gestores." />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-top-bar">
+        <div class="container">
+          <div class="header-logo">
+            <a href="index.html">
+              <img src="Logo Grupo O. de Quadro.png" alt="O de Quadro - Grupo" />
+            </a>
+          </div>
+        </div>
+      </div>
+      <nav class="main-nav">
+        <div class="container">
+          <ul class="nav-links">
+            <li><a href="index.html">Início</a></li>
+            <li><a href="solucoes.html">Soluções</a></li>
+            <li><a href="segmentos.html">Segmentos</a></li>
+            <li><a href="incorporadora.html">Incorporadora</a></li>
+            <li><a href="certificacoes.html">Certificações</a></li>
+            <li><a href="noticias.html">Notícias</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="contato.html">Contato</a></li>
+          </ul>
+          <button class="nav-toggle" aria-expanded="false">
+            <span class="hamburger"></span>
+            Menu
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="page-hero ticket-hero">
+        <div class="container">
+          <div class="hero-breadcrumb">
+            <a href="index.html">Início</a>
+            <span>/</span>
+            <a href="faq.html">FAQ</a>
+            <span>/</span>
+            <span>Sistema de Tickets</span>
+          </div>
+          <h1>Sistema de Tickets Interno</h1>
+          <p>Abra e acompanhe solicitações ao Departamento Pessoal e Gestores</p>
+        </div>
+      </section>
+
+      <!-- Login Section -->
+      <section class="ticket-login" id="loginSection">
+        <div class="container">
+          <div class="login-container">
+            <div class="login-card">
+              <div class="login-header">
+                <h2>Acesso ao Sistema</h2>
+                <p>Faça login para abrir ou acompanhar tickets</p>
+              </div>
+              
+              <div class="login-tabs">
+                <button class="tab-btn active" data-tab="colaborador">
+                  <i class="fas fa-user"></i>
+                  Colaborador
+                </button>
+                <button class="tab-btn" data-tab="gestor">
+                  <i class="fas fa-user-tie"></i>
+                  Gestor
+                </button>
+                <button class="tab-btn" data-tab="dp">
+                  <i class="fas fa-users-cog"></i>
+                  Depto. Pessoal
+                </button>
+              </div>
+
+              <form class="login-form" id="loginForm">
+                <div class="form-group">
+                  <label for="cpf">CPF</label>
+                  <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="senha">Senha</label>
+                  <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+                </div>
+
+                <button type="submit" class="login-btn">
+                  <i class="fas fa-sign-in-alt"></i>
+                  Entrar no Sistema
+                </button>
+              </form>
+
+              <div class="login-help">
+                <p><strong>Primeira vez?</strong> Sua senha inicial é os últimos 4 dígitos do seu CPF.</p>
+                <p><strong>Esqueceu a senha?</strong> Procure o Departamento Pessoal para resetar.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Section (Hidden initially) -->
+      <section class="ticket-dashboard" id="dashboardSection" style="display: none;">
+        <div class="container">
+          
+          <!-- Dashboard Header -->
+          <div class="dashboard-header">
+            <div class="user-info">
+              <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <div class="user-details">
+                <h3 id="userName">Usuário</h3>
+                <span id="userRole" class="user-role">Colaborador</span>
+              </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              Sair
+            </button>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="action-btn primary" onclick="openNewTicketModal()">
+              <i class="fas fa-plus"></i>
+              Novo Ticket
+            </button>
+            <button class="action-btn" onclick="refreshTickets()">
+              <i class="fas fa-sync-alt"></i>
+              Atualizar
+            </button>
+          </div>
+
+          <!-- Tickets Filter -->
+          <div class="tickets-filter">
+            <div class="filter-tabs">
+              <button class="filter-btn active" data-filter="all">Todos</button>
+              <button class="filter-btn" data-filter="aberto">Abertos</button>
+              <button class="filter-btn" data-filter="em-andamento">Em Andamento</button>
+              <button class="filter-btn" data-filter="resolvido">Resolvidos</button>
+            </div>
+          </div>
+
+          <!-- Tickets List -->
+          <div class="tickets-list" id="ticketsList">
+            <!-- Tickets serão carregados dinamicamente -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- New Ticket Modal -->
+      <div class="modal" id="newTicketModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Novo Ticket</h3>
+            <button class="modal-close" onclick="closeNewTicketModal()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <form class="ticket-form" id="newTicketForm">
+            <div class="form-group">
+              <label for="categoria">Categoria</label>
+              <select id="categoria" name="categoria" required>
+                <option value="">Selecione uma categoria</option>
+                <option value="ponto">Controle de Ponto</option>
+                <option value="beneficios">Benefícios</option>
+                <option value="ferias">Férias e Folgas</option>
+                <option value="pagamento">Pagamento</option>
+                <option value="documentos">Documentos</option>
+                <option value="outros">Outros</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="prioridade">Prioridade</label>
+              <select id="prioridade" name="prioridade" required>
+                <option value="baixa">Baixa</option>
+                <option value="media">Média</option>
+                <option value="alta">Alta</option>
+                <option value="urgente">Urgente</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="assunto">Assunto</label>
+              <input type="text" id="assunto" name="assunto" placeholder="Descreva brevemente sua solicitação" required>
+            </div>
+
+            <div class="form-group">
+              <label for="descricao">Descrição Detalhada</label>
+              <textarea id="descricao" name="descricao" rows="5" placeholder="Detalhe sua solicitação ou problema..." required></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn secondary" onclick="closeNewTicketModal()">Cancelar</button>
+              <button type="submit" class="btn primary">Abrir Ticket</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Ticket Detail Modal -->
+      <div class="modal" id="ticketDetailModal">
+        <div class="modal-content large">
+          <div class="modal-header">
+            <h3 id="ticketDetailTitle">Detalhes do Ticket</h3>
+            <button class="modal-close" onclick="closeTicketDetailModal()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div class="ticket-detail-content" id="ticketDetailContent">
+            <!-- Conteúdo será preenchido dinamicamente -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-top">
+        <div class="container">
+          <div class="footer-contact">
+            <div class="contact-item">
+              <i class="icon-email-green"></i>
+              <span>contato@odequadroservicos.com.br</span>
+            </div>
+            <div class="footer-logo">
+              <img src="Logo Grupo O. de Quadro.png" alt="O de Quadro" />
+            </div>
+            <div class="contact-item">
+              <i class="icon-phone-green"></i>
+              <span>+55 19 3278-2401</span>
+              <div class="whatsapp-icon">
+                <i class="icon-whatsapp"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="container">
+          <p class="dev-credit">Desenvolvido por <strong>Bela Nascimento</strong></p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+      // Sistema de Tickets - API Integration
+      let currentUser = null;
+      let authToken = null;
+      const API_BASE = '/api';
+
+      // Login functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const loginForm = document.getElementById('loginForm');
+
+        // Tab switching
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+
+        // Login form
+        loginForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const cpf = document.getElementById('cpf').value;
+          const senha = document.getElementById('senha').value;
+          const role = document.querySelector('.tab-btn.active').dataset.tab;
+
+          try {
+            const response = await fetch(`${API_BASE}/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ cpf, senha, role })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              authToken = data.token;
+              currentUser = data.user;
+              currentUser.roleLabel = role === 'colaborador' ? 'Colaborador' : 
+                                    role === 'gestor' ? 'Gestor' : 'Departamento Pessoal';
+              
+              localStorage.setItem('authToken', authToken);
+              localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+              showDashboard();
+              loadTickets();
+              loadDashboardStats();
+            } else {
+              alert(data.error || 'Erro no login');
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            alert('Erro de conexão');
+          }
+        });
+
+        // Check for existing session
+        const savedToken = localStorage.getItem('authToken');
+        const savedUser = localStorage.getItem('currentUser');
+        
+        if (savedToken && savedUser) {
+          authToken = savedToken;
+          currentUser = JSON.parse(savedUser);
+          showDashboard();
+          loadTickets();
+          loadDashboardStats();
+        }
+      });
+
+      function showDashboard() {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('dashboardSection').style.display = 'block';
+        
+        document.getElementById('userName').textContent = currentUser.nome;
+        document.getElementById('userRole').textContent = currentUser.roleLabel;
+      }
+
+      function logout() {
+        currentUser = null;
+        authToken = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('dashboardSection').style.display = 'none';
+        document.getElementById('loginForm').reset();
+      }
+
+      async function loadTickets(status = null) {
+        try {
+          let url = `${API_BASE}/tickets`;
+          if (status) {
+            url += `?status=${status}`;
+          }
+
+          const response = await fetch(url, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+
+          if (response.ok) {
+            const tickets = await response.json();
+            displayTickets(tickets);
+          } else {
+            console.error('Error loading tickets');
+          }
+        } catch (error) {
+          console.error('Load tickets error:', error);
+        }
+      }
+
+      function displayTickets(tickets) {
+        const ticketsList = document.getElementById('ticketsList');
+        ticketsList.innerHTML = '';
+
+        if (tickets.length === 0) {
+          ticketsList.innerHTML = '<div class="no-tickets">Nenhum ticket encontrado</div>';
+          return;
+        }
+
+        tickets.forEach(ticket => {
+          const ticketElement = createTicketElement(ticket);
+          ticketsList.appendChild(ticketElement);
+        });
+      }
+
+      async function loadDashboardStats() {
+        try {
+          const response = await fetch(`${API_BASE}/dashboard/stats`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+
+          if (response.ok) {
+            const stats = await response.json();
+            updateStatsDisplay(stats);
+          }
+        } catch (error) {
+          console.error('Load stats error:', error);
+        }
+      }
+
+      function updateStatsDisplay(stats) {
+        // Add stats display to dashboard if needed
+        console.log('Dashboard stats:', stats);
+      }
+
+      function createTicketElement(ticket) {
+        const div = document.createElement('div');
+        div.className = `ticket-item ${ticket.status}`;
+        
+        const statusBadge = getStatusBadge(ticket.status);
+        const priorityBadge = getPriorityBadge(ticket.prioridade);
+
+        div.innerHTML = `
+          <div class="ticket-header">
+            <div class="ticket-id">#${ticket.numero || ticket.id}</div>
+            <div class="ticket-badges">
+              ${statusBadge}
+              ${priorityBadge}
+            </div>
+          </div>
+          <div class="ticket-content">
+            <h4>${ticket.assunto}</h4>
+            <p class="ticket-meta">
+              <span><i class="fas fa-user"></i> ${ticket.solicitante_nome || ticket.solicitante}</span>
+              <span><i class="fas fa-calendar"></i> ${formatDate(ticket.created_at || ticket.data)}</span>
+              <span><i class="fas fa-tag"></i> ${getCategoryLabel(ticket.categoria)}</span>
+              ${ticket.setor ? `<span><i class="fas fa-building"></i> ${ticket.setor}</span>` : ''}
+            </p>
+          </div>
+          <div class="ticket-actions">
+            <button class="btn small" onclick="viewTicket(${ticket.id})">
+              <i class="fas fa-eye"></i> Ver Detalhes
+            </button>
+          </div>
+        `;
+
+        return div;
+      }
+
+      function getStatusBadge(status) {
+        const badges = {
+          'aberto': '<span class="status-badge aberto">Aberto</span>',
+          'em-andamento': '<span class="status-badge em-andamento">Em Andamento</span>',
+          'resolvido': '<span class="status-badge resolvido">Resolvido</span>'
+        };
+        return badges[status] || '';
+      }
+
+      function getPriorityBadge(priority) {
+        const badges = {
+          'baixa': '<span class="priority-badge baixa">Baixa</span>',
+          'media': '<span class="priority-badge media">Média</span>',
+          'alta': '<span class="priority-badge alta">Alta</span>',
+          'urgente': '<span class="priority-badge urgente">Urgente</span>'
+        };
+        return badges[priority] || '';
+      }
+
+      function getCategoryLabel(category) {
+        const labels = {
+          'ponto': 'Controle de Ponto',
+          'beneficios': 'Benefícios',
+          'ferias': 'Férias e Folgas',
+          'pagamento': 'Pagamento',
+          'documentos': 'Documentos',
+          'outros': 'Outros'
+        };
+        return labels[category] || category;
+      }
+
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+      }
+
+      function openNewTicketModal() {
+        document.getElementById('newTicketModal').style.display = 'flex';
+      }
+
+      function closeNewTicketModal() {
+        document.getElementById('newTicketModal').style.display = 'none';
+        document.getElementById('newTicketForm').reset();
+      }
+
+      async function viewTicket(ticketId) {
+        try {
+          const response = await fetch(`${API_BASE}/tickets/${ticketId}`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+
+          if (response.ok) {
+            const ticket = await response.json();
+            
+            document.getElementById('ticketDetailTitle').textContent = `Ticket #${ticket.numero}`;
+            
+            const content = `
+              <div class="ticket-detail-info">
+                <div class="detail-row">
+                  <strong>Assunto:</strong> ${ticket.assunto}
+                </div>
+                <div class="detail-row">
+                  <strong>Categoria:</strong> ${getCategoryLabel(ticket.categoria)}
+                </div>
+                <div class="detail-row">
+                  <strong>Prioridade:</strong> ${ticket.prioridade}
+                </div>
+                <div class="detail-row">
+                  <strong>Status:</strong> ${ticket.status}
+                </div>
+                <div class="detail-row">
+                  <strong>Data:</strong> ${formatDate(ticket.created_at)}
+                </div>
+                <div class="detail-row">
+                  <strong>Solicitante:</strong> ${ticket.solicitante_nome}
+                </div>
+                ${ticket.setor ? `
+                  <div class="detail-row">
+                    <strong>Setor:</strong> ${ticket.setor}
+                  </div>
+                ` : ''}
+                ${ticket.assigned_nome ? `
+                  <div class="detail-row">
+                    <strong>Responsável:</strong> ${ticket.assigned_nome}
+                  </div>
+                ` : ''}
+              </div>
+              <div class="ticket-description">
+                <strong>Descrição:</strong>
+                <p>${ticket.descricao}</p>
+              </div>
+              ${ticket.resposta ? `
+                <div class="ticket-response">
+                  <strong>Resposta:</strong>
+                  <p>${ticket.resposta}</p>
+                </div>
+              ` : ''}
+              ${ticket.comments && ticket.comments.length > 0 ? `
+                <div class="ticket-comments">
+                  <strong>Comentários:</strong>
+                  ${ticket.comments.map(comment => `
+                    <div class="comment">
+                      <div class="comment-header">
+                        <strong>${comment.autor_nome}</strong>
+                        <small>${formatDate(comment.created_at)}</small>
+                      </div>
+                      <p>${comment.comentario}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+            `;
+            
+            document.getElementById('ticketDetailContent').innerHTML = content;
+            document.getElementById('ticketDetailModal').style.display = 'flex';
+          } else {
+            alert('Erro ao carregar detalhes do ticket');
+          }
+        } catch (error) {
+          console.error('View ticket error:', error);
+          alert('Erro de conexão');
+        }
+      }
+
+      function closeTicketDetailModal() {
+        document.getElementById('ticketDetailModal').style.display = 'none';
+      }
+
+      function refreshTickets() {
+        loadTickets();
+        loadDashboardStats();
+      }
+
+      // New ticket form submission
+      document.getElementById('newTicketForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const ticketData = {
+          categoria: formData.get('categoria'),
+          prioridade: formData.get('prioridade'),
+          assunto: formData.get('assunto'),
+          descricao: formData.get('descricao')
+        };
+
+        try {
+          const response = await fetch(`${API_BASE}/tickets`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(ticketData)
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            closeNewTicketModal();
+            loadTickets();
+            alert(`Ticket #${data.ticket.numero} criado com sucesso!`);
+          } else {
+            alert(data.error || 'Erro ao criar ticket');
+          }
+        } catch (error) {
+          console.error('Create ticket error:', error);
+          alert('Erro de conexão');
+        }
+      });
+
+      // Filter functionality
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('filter-btn')) {
+          document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+          e.target.classList.add('active');
+          
+          const filter = e.target.dataset.filter;
+          filterTickets(filter);
+        }
+      });
+
+      function filterTickets(filter) {
+        if (filter === 'all') {
+          loadTickets();
+        } else {
+          loadTickets(filter);
+        }
+      }
+    </script>
+  </body>
+</html>

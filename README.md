@@ -1,8 +1,8 @@
-# O de Quadro - Centro de Negócios Multiespecialistas
+# Sistema de Tickets O de Quadro
 
-Recreação fiel do site oficial da O de Quadro, empresa especializada em soluções de mão de obra, terceirização, construção e assessoria em licitações.
+Sistema interno de tickets para gestão de solicitações entre colaboradores, departamento pessoal e gestores da O de Quadro.
 
-**Desenvolvido por Bela Nascimento** - Reprodução exata das cores, layout, efeitos e funcionalidades do site original.
+**Desenvolvido por Bela Nascimento** - Sistema completo com backend Node.js, autenticação JWT e banco MySQL.
 
 ## 🚀 Como executar localmente
 
