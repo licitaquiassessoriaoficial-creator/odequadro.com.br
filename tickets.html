@@ -77,8 +77,13 @@
                   <i class="fas fa-users-cog"></i>
                   Depto. Pessoal
                 </button>
+                <button class="tab-btn primeiro-acesso" data-tab="primeiro-acesso">
+                  <i class="fas fa-user-plus"></i>
+                  Primeiro Acesso
+                </button>
               </div>
 
+              <!-- Formulário de Login -->
               <form class="login-form" id="loginForm">
                 <div class="form-group">
                   <label for="cpf">CPF</label>
@@ -95,10 +100,73 @@
                   Entrar no Sistema
                 </button>
               </form>
+              
+              <!-- Formulário de Primeiro Acesso -->
+              <form class="primeiro-acesso-form form-hidden" id="primeiroAcessoForm">
+                <div class="form-group">
+                  <label for="primeiroCPF">CPF</label>
+                  <input type="text" id="primeiroCPF" name="cpf" placeholder="000.000.000-00" maxlength="14" pattern="[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}|[0-9]{11}" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="primeiroNome">Nome Completo</label>
+                  <input type="text" id="primeiroNome" name="nome" placeholder="Digite seu nome completo" maxlength="100" minlength="2" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="primeiroEmail">E-mail</label>
+                  <input type="email" id="primeiroEmail" name="email" placeholder="seu@email.com" maxlength="100" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="primeiroSetor">Setor</label>
+                  <select id="primeiroSetor" name="setor" required>
+                    <option value="">Selecione seu setor</option>
+                    <option value="Administrativo">Administrativo</option>
+                    <option value="Financeiro">Financeiro</option>
+                    <option value="Comercial">Comercial</option>
+                    <option value="Operacional">Operacional</option>
+                    <option value="Jurídico">Jurídico</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                    <option value="TI">TI</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="primeiroTipo">Tipo de Usuário</label>
+                  <select id="primeiroTipo" name="role" required>
+                    <option value="">Selecione seu tipo</option>
+                    <option value="colaborador">Colaborador</option>
+                    <option value="gestor">Gestor</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="primeiroSenha">Nova Senha</label>
+                  <input type="password" id="primeiroSenha" name="senha" placeholder="Mínimo 6 caracteres" maxlength="50" minlength="6" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="primeiroConfirmSenha">Confirmar Senha</label>
+                  <input type="password" id="primeiroConfirmSenha" name="confirmSenha" placeholder="Confirme sua senha" maxlength="50" minlength="6" required>
+                </div>
+
+                <button type="submit" class="login-btn">
+                  <i class="fas fa-user-plus"></i>
+                  Completar Cadastro
+                </button>
+              </form>
 
               <div class="login-help">
-                <p><strong>Primeira vez?</strong> Sua senha inicial é os últimos 4 dígitos do seu CPF.</p>
-                <p><strong>Esqueceu a senha?</strong> <a href="#" onclick="showPasswordReset()">Clique aqui para redefinir</a></p>
+                <div class="help-login">
+                  <p><strong>Primeira vez?</strong> Use a aba "Primeiro Acesso" para se cadastrar.</p>
+                  <p><strong>Esqueceu a senha?</strong> <a href="#" onclick="showPasswordReset()">Clique aqui para redefinir</a></p>
+                </div>
+                <div class="help-primeiro-acesso form-hidden">
+                  <p><strong>Novo no sistema?</strong> Preencha todos os dados para criar sua conta.</p>
+                  <p><strong>Já tem cadastro?</strong> Use uma das outras abas para fazer login.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -494,7 +562,7 @@
 
         function setupFieldValidations() {
           // Máscaras de CPF
-          const cpfInputs = document.querySelectorAll('#cpf, #resetCPF');
+          const cpfInputs = document.querySelectorAll('#cpf, #resetCPF, #primeiroCPF');
           cpfInputs.forEach(input => {
             input.addEventListener('input', function() {
               applyCPFMask(this);
@@ -515,10 +583,12 @@
           const assuntoInput = document.getElementById('assunto');
           const descricaoTextarea = document.getElementById('descricao');
           const nomeInput = document.getElementById('regNome');
+          const primeiroNomeInput = document.getElementById('primeiroNome');
           
           if (assuntoInput) addCharacterCounter(assuntoInput, 200);
           if (descricaoTextarea) addCharacterCounter(descricaoTextarea, 1000);
           if (nomeInput) addCharacterCounter(nomeInput, 100);
+          if (primeiroNomeInput) addCharacterCounter(primeiroNomeInput, 100);
 
           // Validação de senhas iguais no cadastro
           const regSenha = document.getElementById('regSenha');
@@ -527,6 +597,20 @@
           if (regConfirmSenha) {
             regConfirmSenha.addEventListener('input', function() {
               if (regSenha.value !== this.value) {
+                this.setCustomValidity('As senhas não coincidem');
+              } else {
+                this.setCustomValidity('');
+              }
+            });
+          }
+
+          // Validação de senhas iguais no primeiro acesso
+          const primeiroSenha = document.getElementById('primeiroSenha');
+          const primeiroConfirmSenha = document.getElementById('primeiroConfirmSenha');
+          
+          if (primeiroConfirmSenha) {
+            primeiroConfirmSenha.addEventListener('input', function() {
+              if (primeiroSenha.value !== this.value) {
                 this.setCustomValidity('As senhas não coincidem');
               } else {
                 this.setCustomValidity('');
@@ -567,6 +651,25 @@
           btn.addEventListener('click', function() {
             tabBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+            
+            // Alternar entre formulários
+            const selectedTab = this.dataset.tab;
+            const loginForm = document.getElementById('loginForm');
+            const primeiroAcessoForm = document.getElementById('primeiroAcessoForm');
+            const helpLogin = document.querySelector('.help-login');
+            const helpPrimeiroAcesso = document.querySelector('.help-primeiro-acesso');
+            
+            if (selectedTab === 'primeiro-acesso') {
+              loginForm.classList.add('form-hidden');
+              primeiroAcessoForm.classList.remove('form-hidden');
+              helpLogin.classList.add('form-hidden');
+              helpPrimeiroAcesso.classList.remove('form-hidden');
+            } else {
+              loginForm.classList.remove('form-hidden');
+              primeiroAcessoForm.classList.add('form-hidden');
+              helpLogin.classList.remove('form-hidden');
+              helpPrimeiroAcesso.classList.add('form-hidden');
+            }
           });
         });
 
@@ -689,6 +792,59 @@
             }
           } catch (error) {
             console.error('Password update error:', error);
+            alert('Erro de conexão');
+          }
+        });
+
+        // Primeiro acesso form
+        const primeiroAcessoForm = document.getElementById('primeiroAcessoForm');
+        primeiroAcessoForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(this);
+          const senha = formData.get('senha');
+          const confirmSenha = formData.get('confirmSenha');
+          
+          if (senha !== confirmSenha) {
+            alert('As senhas não coincidem');
+            return;
+          }
+          
+          if (senha.length < 6) {
+            alert('A senha deve ter pelo menos 6 caracteres');
+            return;
+          }
+          
+          const userData = {
+            cpf: formData.get('cpf'),
+            nome: formData.get('nome'),
+            email: formData.get('email'),
+            senha: senha,
+            role: formData.get('role'),
+            setor: formData.get('setor')
+          };
+
+          try {
+            const response = await fetch(`${API_BASE}/register`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              alert('Cadastro realizado com sucesso! Agora você pode fazer login.');
+              // Limpar formulário e voltar para aba de login
+              primeiroAcessoForm.reset();
+              document.querySelector('[data-tab="colaborador"]').click();
+            } else {
+              alert(data.error || 'Erro no cadastro');
+            }
+          } catch (error) {
+            console.error('Primeiro acesso error:', error);
             alert('Erro de conexão');
           }
         });

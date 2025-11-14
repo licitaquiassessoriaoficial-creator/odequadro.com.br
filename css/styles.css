@@ -7821,3 +7821,56 @@ html {
   border: 5px solid transparent;
   border-top-color: var(--color-gray-900);
 }
+
+/* Estilos para primeiro acesso */
+.tab-btn.primeiro-acesso {
+  background: linear-gradient(135deg, var(--color-info), var(--color-primary));
+  color: white;
+  font-weight: 600;
+}
+
+.tab-btn.primeiro-acesso:hover {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-info));
+  transform: translateY(-2px);
+}
+
+.tab-btn.primeiro-acesso.active {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-info));
+  box-shadow: 0 4px 12px rgba(46, 184, 92, 0.3);
+}
+
+.primeiro-acesso-form {
+  animation: slideIn 0.3s ease;
+}
+
+.form-hidden {
+  display: none !important;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Login tabs responsivo */
+@media (max-width: 768px) {
+  .login-tabs {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .tab-btn {
+    padding: 12px 8px;
+    font-size: 0.85rem;
+  }
+  
+  .tab-btn i {
+    margin-right: 4px;
+  }
+}
