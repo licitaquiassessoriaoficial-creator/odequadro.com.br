@@ -14,28 +14,36 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('.'));
 
-// Database connection
+// Database connection pool configuration
 const dbConfig = {
   host: process.env.MYSQL_HOST || process.env.DB_HOST || 'localhost',
   user: process.env.MYSQL_USER || process.env.DB_USER || 'root',
   password: process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || process.env.DB_NAME || 'railway',
-  port: process.env.MYSQL_PORT || process.env.DB_PORT || 3306
+  port: process.env.MYSQL_PORT || process.env.DB_PORT || 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  acquireTimeout: 60000,
+  timeout: 60000,
+  reconnect: true
 };
 
+// Use connection pool for automatic reconnection
 let db;
 
 async function connectDB() {
   try {
-    console.log('Attempting to connect to database with config:', {
+    console.log('Creating connection pool with config:', {
       host: dbConfig.host,
       user: dbConfig.user,
       database: dbConfig.database,
       port: dbConfig.port
     });
     
-    db = await mysql.createConnection(dbConfig);
-    console.log('Connected to MySQL database successfully');
+    db = mysql.createPool(dbConfig);
+    
+    console.log('MySQL connection pool created successfully');
     
     // Test connection
     await db.execute('SELECT 1');
@@ -49,24 +57,7 @@ async function connectDB() {
     console.log('MYSQL_HOST:', process.env.MYSQL_HOST);
     console.log('MYSQL_USER:', process.env.MYSQL_USER);
     console.log('MYSQL_DATABASE:', process.env.MYSQL_DATABASE);
-    
-    // Retry connection after 5 seconds
-    setTimeout(connectDB, 5000);
-  }
-}
-
-// Ensure database connection before executing queries
-async function ensureConnection() {
-  if (!db) {
-    console.log('Database not connected, attempting to reconnect...');
-    await connectDB();
-  }
-  
-  try {
-    await db.execute('SELECT 1');
-  } catch (error) {
-    console.log('Connection lost, reconnecting...');
-    await connectDB();
+    throw error; // Re-throw to stop server startup
   }
 }
 
@@ -169,19 +160,19 @@ const authenticateToken = (req, res, next) => {
 // Login
 app.post('/api/login', async (req, res) => {
   try {
-    // Ensure database connection
-    await ensureConnection();
-    
     const { cpf, senha, role } = req.body;
+    
+    // Clean CPF (remove dots and dashes) to match stored format
+    const cleanCPF = cpf.replace(/\D/g, '');
 
     const [users] = await db.execute(
       'SELECT * FROM users WHERE cpf = ? AND role = ?',
-      [cpf, role]
+      [cleanCPF, role]
     );
 
     if (users.length === 0) {
       // Check if user exists with default password (last 4 digits of CPF)
-      const defaultPassword = cpf.slice(-4);
+      const defaultPassword = cleanCPF.slice(-4);
       if (senha === defaultPassword) {
         return res.status(401).json({ 
           error: 'Primeiro acesso detectado. Complete seu cadastro.',
@@ -229,9 +220,6 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/register', async (req, res) => {
   try {
     console.log('Register request received:', req.body);
-    
-    // Ensure database connection
-    await ensureConnection();
 
     const { cpf, nome, email, senha, role, setor } = req.body;
 
@@ -283,8 +271,6 @@ app.post('/api/register', async (req, res) => {
 // Create ticket
 app.post('/api/tickets', authenticateToken, async (req, res) => {
   try {
-    await ensureConnection();
-    
     const { categoria, prioridade, assunto, descricao } = req.body;
     const numero = generateTicketNumber();
 
@@ -309,8 +295,6 @@ app.post('/api/tickets', authenticateToken, async (req, res) => {
 // Get tickets
 app.get('/api/tickets', authenticateToken, async (req, res) => {
   try {
-    await ensureConnection();
-    
     const { status, categoria } = req.query;
     let query = `
       SELECT t.*, u.nome as solicitante_nome, u.setor,
@@ -396,8 +380,6 @@ app.get('/api/tickets/:id', authenticateToken, async (req, res) => {
 // Dashboard statistics
 app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
   try {
-    await ensureConnection();
-    
     let whereClause = '';
     let params = [];
 
@@ -475,16 +457,17 @@ app.post('/api/tickets/:id/comments', authenticateToken, async (req, res) => {
   }
 });
 
-// Remove duplicate dashboard stats route
-
 // Password reset verification
 app.post('/api/password-reset/verify', async (req, res) => {
   try {
     const { cpf, role } = req.body;
 
+    // Clean CPF for consistency
+    const cleanCPF = cpf.replace(/\D/g, '');
+
     const [users] = await db.execute(
       'SELECT id, cpf, nome, email, setor, role FROM users WHERE cpf = ? AND role = ?',
-      [cpf, role]
+      [cleanCPF, role]
     );
 
     if (users.length === 0) {
@@ -518,10 +501,13 @@ app.post('/api/password-reset/update', async (req, res) => {
       return res.status(400).json({ error: 'Senha deve ter pelo menos 6 caracteres' });
     }
 
+    // Clean CPF for consistency
+    const cleanCPF = cpf.replace(/\D/g, '');
+
     // Verify user exists
     const [users] = await db.execute(
       'SELECT id FROM users WHERE cpf = ? AND role = ?',
-      [cpf, role]
+      [cleanCPF, role]
     );
 
     if (users.length === 0) {
@@ -534,7 +520,7 @@ app.post('/api/password-reset/update', async (req, res) => {
     // Update password
     await db.execute(
       'UPDATE users SET senha = ? WHERE cpf = ? AND role = ?',
-      [hashedPassword, cpf, role]
+      [hashedPassword, cleanCPF, role]
     );
 
     res.json({ message: 'Senha atualizada com sucesso' });
@@ -624,7 +610,6 @@ app.get('/api/test', (req, res) => {
 // Health check route
 app.get('/api/health', async (req, res) => {
   try {
-    await ensureConnection();
     await db.execute('SELECT 1');
     res.json({
       status: 'OK',
@@ -652,11 +637,25 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Algo deu errado!' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log('Attempting database connection...');
-  connectDB();
-});
+// Start server only after database connection
+async function startServer() {
+  try {
+    console.log('🔄 Initializing database connection...');
+    await connectDB();
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log('✅ Database connected and ready');
+      console.log('🌐 API endpoints available at /api/*');
+      console.log('🎯 Ready for requests!');
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error.message);
+    process.exit(1);
+  }
+}
+
+// Start the server
+startServer();
 
 module.exports = app;
