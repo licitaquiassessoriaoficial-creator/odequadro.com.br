@@ -363,7 +363,12 @@ app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
       ${whereClause}
     `, params);
 
-    res.json(stats[0]);
+    res.json({
+      total: stats[0].total || 0,
+      abertos: stats[0].abertos || 0,
+      andamento: stats[0].andamento || 0,
+      resolvidos: stats[0].resolvidos || 0
+    });
   } catch (error) {
     console.error('Dashboard stats error:', error);
     res.status(500).json({ error: 'Erro ao buscar estatísticas' });
@@ -410,32 +415,7 @@ app.post('/api/tickets/:id/comments', authenticateToken, async (req, res) => {
   }
 });
 
-// Get dashboard stats
-app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
-  try {
-    let whereClause = '';
-    let params = [];
-
-    if (req.user.role === 'colaborador') {
-      whereClause = 'WHERE user_id = ?';
-      params = [req.user.id];
-    }
-
-    const [stats] = await db.execute(`
-      SELECT 
-        COUNT(*) as total,
-        SUM(CASE WHEN status = 'aberto' THEN 1 ELSE 0 END) as abertos,
-        SUM(CASE WHEN status = 'em-andamento' THEN 1 ELSE 0 END) as em_andamento,
-        SUM(CASE WHEN status = 'resolvido' THEN 1 ELSE 0 END) as resolvidos
-      FROM tickets ${whereClause}
-    `, params);
-
-    res.json(stats[0]);
-  } catch (error) {
-    console.error('Get stats error:', error);
-    res.status(500).json({ error: 'Erro ao buscar estatísticas' });
-  }
-});
+// Remove duplicate dashboard stats route
 
 // Password reset verification
 app.post('/api/password-reset/verify', async (req, res) => {
@@ -543,7 +523,7 @@ app.get('/api/tickets/export', authenticateToken, async (req, res) => {
 
     // Convert to CSV
     const headers = ['Número', 'Categoria', 'Prioridade', 'Assunto', 'Descrição', 'Status', 'Solicitante', 'Setor', 'Data Criação', 'Responsável', 'Resposta'];
-    let csv = headers.join(',') + '\\n';
+    let csv = headers.join(',') + '\n';
     
     tickets.forEach(ticket => {
       const row = [
@@ -559,7 +539,7 @@ app.get('/api/tickets/export', authenticateToken, async (req, res) => {
         ticket.responsavel || '',
         ticket.resposta ? `"${ticket.resposta.replace(/"/g, '""')}"` : ''
       ];
-      csv += row.join(',') + '\\n';
+      csv += row.join(',') + '\n';
     });
 
     res.setHeader('Content-Type', 'text/csv');
