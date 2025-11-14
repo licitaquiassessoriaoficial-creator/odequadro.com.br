@@ -46,10 +46,11 @@ app.use('*', (req, res) => {
   res.status(404).sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
+// Iniciar servidor - Railway precisa de 0.0.0.0
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`📱 Acesse: http://localhost:${PORT}`);
+  console.log(`🌐 Host: 0.0.0.0:${PORT}`);
+  console.log(`✅ Railway-ready!`);
 });
 
 module.exports = app;
