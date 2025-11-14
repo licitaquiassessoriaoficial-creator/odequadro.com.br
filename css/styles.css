@@ -7735,3 +7735,89 @@ html {
     display: none;
   }
 }
+
+/* Estilos para validações e contadores de caracteres */
+.char-counter {
+  color: var(--color-gray-600) !important;
+  font-size: 0.75rem !important;
+  display: block !important;
+  margin-top: 4px !important;
+  text-align: right !important;
+  font-family: var(--font-secondary);
+}
+
+.char-counter.warning {
+  color: var(--color-warning) !important;
+}
+
+.char-counter.danger {
+  color: var(--color-danger) !important;
+}
+
+/* Melhorias nos campos de entrada */
+.form-group input:invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 0.1rem rgba(220, 53, 69, 0.1);
+}
+
+.form-group input:valid {
+  border-color: var(--color-success);
+}
+
+.form-group textarea:invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 0.1rem rgba(220, 53, 69, 0.1);
+}
+
+.form-group textarea:valid {
+  border-color: var(--color-success);
+}
+
+/* Indicador de força da senha */
+.password-strength {
+  margin-top: 5px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-gray-200);
+  overflow: hidden;
+}
+
+.password-strength-bar {
+  height: 100%;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.strength-weak { background: var(--color-danger); width: 25%; }
+.strength-fair { background: var(--color-warning); width: 50%; }
+.strength-good { background: var(--color-info); width: 75%; }
+.strength-strong { background: var(--color-success); width: 100%; }
+
+/* Tooltips para validação */
+.field-tooltip {
+  position: absolute;
+  background: var(--color-gray-900);
+  color: var(--color-white);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  z-index: 1000;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.field-tooltip.show {
+  opacity: 1;
+}
+
+.field-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border: 5px solid transparent;
+  border-top-color: var(--color-gray-900);
+}
