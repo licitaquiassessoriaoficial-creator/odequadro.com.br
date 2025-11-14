@@ -105,6 +105,66 @@
         </div>
       </section>
 
+      <!-- Register Section (Hidden initially) -->
+      <section class="ticket-register dashboard-hidden" id="registerSection">
+        <div class="container">
+          <div class="register-container">
+            <div class="register-card">
+              <div class="register-header">
+                <h2>Primeiro Acesso - Cadastro</h2>
+                <p>Complete seus dados para acessar o sistema</p>
+              </div>
+              
+              <form class="register-form" id="registerForm">
+                <div class="form-group">
+                  <label for="regNome">Nome Completo</label>
+                  <input type="text" id="regNome" name="nome" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="regEmail">E-mail</label>
+                  <input type="email" id="regEmail" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="regSetor">Setor</label>
+                  <select id="regSetor" name="setor" required>
+                    <option value="">Selecione seu setor</option>
+                    <option value="Administrativo">Administrativo</option>
+                    <option value="Financeiro">Financeiro</option>
+                    <option value="Comercial">Comercial</option>
+                    <option value="Operacional">Operacional</option>
+                    <option value="Jurídico">Jurídico</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                    <option value="TI">TI</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="regSenha">Nova Senha</label>
+                  <input type="password" id="regSenha" name="senha" placeholder="Mínimo 6 caracteres" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="regConfirmSenha">Confirmar Senha</label>
+                  <input type="password" id="regConfirmSenha" name="confirmSenha" required>
+                </div>
+
+                <button type="submit" class="register-btn">
+                  <i class="fas fa-user-plus"></i>
+                  Completar Cadastro
+                </button>
+              </form>
+
+              <div class="register-help">
+                <p><strong>Dúvidas?</strong> Procure o Departamento Pessoal para assistência.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Dashboard Section (Hidden initially) -->
       <section class="ticket-dashboard dashboard-hidden" id="dashboardSection">
         <div class="container">
@@ -303,6 +363,8 @@
       // Sistema de Tickets - API Integration
       let currentUser = null;
       let authToken = null;
+      let currentUserCPF = null;
+      let currentUserRole = null;
       const API_BASE = '/api';
 
       // Login functionality
@@ -349,11 +411,69 @@
               showDashboard();
               loadTickets();
               loadDashboardStats();
+            } else if (response.status === 401 && data.needsRegistration) {
+              // Primeiro acesso - mostrar tela de cadastro
+              currentUserCPF = cpf;
+              currentUserRole = role;
+              showRegisterSection();
             } else {
               alert(data.error || 'Erro no login');
             }
           } catch (error) {
             console.error('Login error:', error);
+            alert('Erro de conexão');
+          }
+        });
+
+        // Register form
+        const registerForm = document.getElementById('registerForm');
+        registerForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(this);
+          const senha = formData.get('senha');
+          const confirmSenha = formData.get('confirmSenha');
+          
+          if (senha !== confirmSenha) {
+            alert('As senhas não coincidem');
+            return;
+          }
+          
+          if (senha.length < 6) {
+            alert('A senha deve ter pelo menos 6 caracteres');
+            return;
+          }
+          
+          const userData = {
+            cpf: currentUserCPF,
+            nome: formData.get('nome'),
+            email: formData.get('email'),
+            senha: senha,
+            role: currentUserRole,
+            setor: formData.get('setor')
+          };
+
+          try {
+            const response = await fetch(`${API_BASE}/register`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              alert('Cadastro realizado com sucesso! Agora você pode fazer login.');
+              document.getElementById('registerSection').classList.add('dashboard-hidden');
+              document.getElementById('loginSection').classList.remove('dashboard-hidden');
+              document.getElementById('loginForm').reset();
+            } else {
+              alert(data.error || 'Erro no cadastro');
+            }
+          } catch (error) {
+            console.error('Register error:', error);
             alert('Erro de conexão');
           }
         });
@@ -402,6 +522,11 @@
           document.querySelector('.page-hero h1').textContent = 'Administração de Tickets';
           document.querySelector('.page-hero p').textContent = 'Gerencie todas as solicitações da empresa';
         }
+      }
+
+      function showRegisterSection() {
+        document.getElementById('loginSection').classList.add('dashboard-hidden');
+        document.getElementById('registerSection').classList.remove('dashboard-hidden');
       }
 
       function logout() {

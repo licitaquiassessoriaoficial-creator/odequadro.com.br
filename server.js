@@ -155,7 +155,15 @@ app.post('/api/login', async (req, res) => {
     );
 
     if (users.length === 0) {
-      return res.status(401).json({ error: 'Usuário não encontrado' });
+      // Check if user exists with default password (last 4 digits of CPF)
+      const defaultPassword = cpf.slice(-4);
+      if (senha === defaultPassword) {
+        return res.status(401).json({ 
+          error: 'Primeiro acesso detectado. Complete seu cadastro.',
+          needsRegistration: true
+        });
+      }
+      return res.status(401).json({ error: 'Usuário não encontrado ou senha incorreta' });
     }
 
     const user = users[0];
@@ -192,12 +200,9 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Register user (only for admin)
-app.post('/api/register', authenticateToken, async (req, res) => {
+// Register user (for first access and admin)
+app.post('/api/register', async (req, res) => {
   try {
-    if (req.user.role !== 'dp') {
-      return res.status(403).json({ error: 'Apenas o Departamento Pessoal pode cadastrar usuários' });
-    }
 
     const { cpf, nome, email, senha, role, setor } = req.body;
 
