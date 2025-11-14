@@ -106,7 +106,7 @@
       </section>
 
       <!-- Dashboard Section (Hidden initially) -->
-      <section class="ticket-dashboard" id="dashboardSection" style="display: none;">
+      <section class="ticket-dashboard dashboard-hidden" id="dashboardSection">
         <div class="container">
           
           <!-- Dashboard Header -->
@@ -126,6 +126,46 @@
             </button>
           </div>
 
+          <!-- Dashboard Stats -->
+          <div class="dashboard-stats" id="dashboardStats">
+            <div class="stat-card">
+              <div class="stat-icon aberto">
+                <i class="fas fa-inbox"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="statsAbertos">0</h3>
+                <p>Tickets Abertos</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon em-andamento">
+                <i class="fas fa-cogs"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="statsAndamento">0</h3>
+                <p>Em Andamento</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon resolvido">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="statsResolvidos">0</h3>
+                <p>Resolvidos</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon total">
+                <i class="fas fa-chart-bar"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="statsTotal">0</h3>
+                <p>Total Geral</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Action Buttons -->
           <div class="action-buttons">
             <button class="action-btn primary" onclick="openNewTicketModal()">
@@ -135,6 +175,10 @@
             <button class="action-btn" onclick="refreshTickets()">
               <i class="fas fa-sync-alt"></i>
               Atualizar
+            </button>
+            <button class="action-btn secondary export-hidden" onclick="exportTickets()" id="exportBtn">
+              <i class="fas fa-download"></i>
+              Exportar
             </button>
           </div>
 
@@ -161,7 +205,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h3>Novo Ticket</h3>
-            <button class="modal-close" onclick="closeNewTicketModal()">
+            <button class="modal-close" onclick="closeNewTicketModal()" aria-label="Fechar modal">
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -213,7 +257,7 @@
         <div class="modal-content large">
           <div class="modal-header">
             <h3 id="ticketDetailTitle">Detalhes do Ticket</h3>
-            <button class="modal-close" onclick="closeTicketDetailModal()">
+            <button class="modal-close" onclick="closeTicketDetailModal()" aria-label="Fechar modal">
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -328,11 +372,36 @@
       });
 
       function showDashboard() {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('dashboardSection').style.display = 'block';
+        document.getElementById('loginSection').classList.add('dashboard-hidden');
+        document.getElementById('dashboardSection').classList.remove('dashboard-hidden');
         
         document.getElementById('userName').textContent = currentUser.nome;
         document.getElementById('userRole').textContent = currentUser.roleLabel;
+        
+        // Configurar interface baseada no tipo de usuário
+        setupUserInterface();
+      }
+      
+      function setupUserInterface() {
+        const userRole = currentUser.role;
+        
+        // Diferentes configurações para cada tipo de usuário
+        if (userRole === 'colaborador') {
+          // Colaborador vê apenas seus próprios tickets
+          document.querySelector('.hero-breadcrumb span:last-child').textContent = 'Meus Tickets';
+          document.querySelector('.page-hero h1').textContent = 'Meus Tickets';
+          document.querySelector('.page-hero p').textContent = 'Acompanhe suas solicitações ao Departamento Pessoal';
+        } else if (userRole === 'gestor') {
+          // Gestor vê tickets do seu setor
+          document.querySelector('.hero-breadcrumb span:last-child').textContent = 'Gestão de Tickets';
+          document.querySelector('.page-hero h1').textContent = 'Gestão de Tickets';
+          document.querySelector('.page-hero p').textContent = 'Gerencie tickets da sua equipe e departamento';
+        } else if (userRole === 'dp') {
+          // Departamento Pessoal vê todos os tickets
+          document.querySelector('.hero-breadcrumb span:last-child').textContent = 'Administração de Tickets';
+          document.querySelector('.page-hero h1').textContent = 'Administração de Tickets';
+          document.querySelector('.page-hero p').textContent = 'Gerencie todas as solicitações da empresa';
+        }
       }
 
       function logout() {
@@ -341,8 +410,8 @@
         localStorage.removeItem('authToken');
         localStorage.removeItem('currentUser');
         
-        document.getElementById('loginSection').style.display = 'block';
-        document.getElementById('dashboardSection').style.display = 'none';
+        document.getElementById('loginSection').classList.remove('dashboard-hidden');
+        document.getElementById('dashboardSection').classList.add('dashboard-hidden');
         document.getElementById('loginForm').reset();
       }
 
@@ -403,8 +472,15 @@
       }
 
       function updateStatsDisplay(stats) {
-        // Add stats display to dashboard if needed
-        console.log('Dashboard stats:', stats);
+        document.getElementById('statsAbertos').textContent = stats.abertos || 0;
+        document.getElementById('statsAndamento').textContent = stats.andamento || 0;
+        document.getElementById('statsResolvidos').textContent = stats.resolvidos || 0;
+        document.getElementById('statsTotal').textContent = stats.total || 0;
+        
+        // Show export button for gestors and dp
+        if (currentUser.role === 'gestor' || currentUser.role === 'dp') {
+          document.getElementById('exportBtn').classList.remove('export-hidden');
+        }
       }
 
       function createTicketElement(ticket) {
@@ -424,17 +500,24 @@
           </div>
           <div class="ticket-content">
             <h4>${ticket.assunto}</h4>
-            <p class="ticket-meta">
+            <p class="ticket-description-preview">${ticket.descricao ? ticket.descricao.substring(0, 120) + (ticket.descricao.length > 120 ? '...' : '') : ''}</p>
+            <div class="ticket-meta">
               <span><i class="fas fa-user"></i> ${ticket.solicitante_nome || ticket.solicitante}</span>
               <span><i class="fas fa-calendar"></i> ${formatDate(ticket.created_at || ticket.data)}</span>
               <span><i class="fas fa-tag"></i> ${getCategoryLabel(ticket.categoria)}</span>
               ${ticket.setor ? `<span><i class="fas fa-building"></i> ${ticket.setor}</span>` : ''}
-            </p>
+              ${ticket.assigned_nome ? `<span><i class="fas fa-user-check"></i> ${ticket.assigned_nome}</span>` : ''}
+            </div>
           </div>
           <div class="ticket-actions">
-            <button class="btn small" onclick="viewTicket(${ticket.id})">
+            <button class="btn small primary" onclick="viewTicket(${ticket.id})">
               <i class="fas fa-eye"></i> Ver Detalhes
             </button>
+            ${(currentUser.role === 'dp' || currentUser.role === 'gestor') && ticket.status !== 'resolvido' ? `
+              <button class="btn small secondary" onclick="updateTicketStatus(${ticket.id})">
+                <i class="fas fa-edit"></i> Atualizar
+              </button>
+            ` : ''}
           </div>
         `;
 
@@ -478,11 +561,11 @@
       }
 
       function openNewTicketModal() {
-        document.getElementById('newTicketModal').style.display = 'flex';
+        document.getElementById('newTicketModal').classList.add('modal-active');
       }
 
       function closeNewTicketModal() {
-        document.getElementById('newTicketModal').style.display = 'none';
+        document.getElementById('newTicketModal').classList.remove('modal-active');
         document.getElementById('newTicketForm').reset();
       }
 
@@ -557,7 +640,7 @@
             `;
             
             document.getElementById('ticketDetailContent').innerHTML = content;
-            document.getElementById('ticketDetailModal').style.display = 'flex';
+            document.getElementById('ticketDetailModal').classList.add('modal-active');
           } else {
             alert('Erro ao carregar detalhes do ticket');
           }
@@ -568,7 +651,7 @@
       }
 
       function closeTicketDetailModal() {
-        document.getElementById('ticketDetailModal').style.display = 'none';
+        document.getElementById('ticketDetailModal').classList.remove('modal-active');
       }
 
       function refreshTickets() {
@@ -629,6 +712,64 @@
           loadTickets();
         } else {
           loadTickets(filter);
+        }
+      }
+      
+      async function exportTickets() {
+        try {
+          const response = await fetch(`${API_BASE}/tickets/export`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.classList.add('download-link-hidden');
+            a.href = url;
+            a.download = `tickets-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          } else {
+            alert('Erro ao exportar tickets');
+          }
+        } catch (error) {
+          console.error('Export error:', error);
+          alert('Erro de conexão');
+        }
+      }
+      
+      async function updateTicketStatus(ticketId) {
+        const newStatus = prompt('Novo status (aberto, em-andamento, resolvido):');
+        if (!newStatus || !['aberto', 'em-andamento', 'resolvido'].includes(newStatus)) {
+          alert('Status inválido');
+          return;
+        }
+        
+        try {
+          const response = await fetch(`${API_BASE}/tickets/${ticketId}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ status: newStatus })
+          });
+          
+          if (response.ok) {
+            loadTickets();
+            loadDashboardStats();
+            alert('Status atualizado com sucesso!');
+          } else {
+            alert('Erro ao atualizar status');
+          }
+        } catch (error) {
+          console.error('Update status error:', error);
+          alert('Erro de conexão');
         }
       }
     </script>

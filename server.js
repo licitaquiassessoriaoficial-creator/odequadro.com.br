@@ -330,6 +330,41 @@ app.get('/api/tickets/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Dashboard statistics
+app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
+  try {
+    let whereClause = '';
+    let params = [];
+
+    // Role-based filtering
+    if (req.user.role === 'colaborador') {
+      whereClause = 'WHERE t.user_id = ?';
+      params.push(req.user.id);
+    } else if (req.user.role === 'gestor') {
+      // Gestor sees tickets from their sector
+      whereClause = 'WHERE u.setor = (SELECT setor FROM users WHERE id = ?)';
+      params.push(req.user.id);
+    }
+    // DP sees all tickets (no filter)
+
+    const [stats] = await db.execute(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN t.status = 'aberto' THEN 1 ELSE 0 END) as abertos,
+        SUM(CASE WHEN t.status = 'em-andamento' THEN 1 ELSE 0 END) as andamento,
+        SUM(CASE WHEN t.status = 'resolvido' THEN 1 ELSE 0 END) as resolvidos
+      FROM tickets t
+      JOIN users u ON t.user_id = u.id
+      ${whereClause}
+    `, params);
+
+    res.json(stats[0]);
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+  }
+});
+
 // Update ticket status
 app.put('/api/tickets/:id/status', authenticateToken, async (req, res) => {
   try {
@@ -394,6 +429,74 @@ app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Get stats error:', error);
     res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+  }
+});
+
+// Export tickets
+app.get('/api/tickets/export', authenticateToken, async (req, res) => {
+  try {
+    // Only gestor and dp can export
+    if (req.user.role === 'colaborador') {
+      return res.status(403).json({ error: 'Acesso negado' });
+    }
+
+    let query = `
+      SELECT 
+        t.numero,
+        t.categoria,
+        t.prioridade,
+        t.assunto,
+        t.descricao,
+        t.status,
+        u.nome as solicitante,
+        u.setor,
+        t.created_at,
+        a.nome as responsavel,
+        t.resposta
+      FROM tickets t
+      JOIN users u ON t.user_id = u.id
+      LEFT JOIN users a ON t.assigned_to = a.id
+    `;
+
+    let params = [];
+    
+    if (req.user.role === 'gestor') {
+      query += ' WHERE u.setor = (SELECT setor FROM users WHERE id = ?)';
+      params.push(req.user.id);
+    }
+
+    query += ' ORDER BY t.created_at DESC';
+
+    const [tickets] = await db.execute(query, params);
+
+    // Convert to CSV
+    const headers = ['Número', 'Categoria', 'Prioridade', 'Assunto', 'Descrição', 'Status', 'Solicitante', 'Setor', 'Data Criação', 'Responsável', 'Resposta'];
+    let csv = headers.join(',') + '\\n';
+    
+    tickets.forEach(ticket => {
+      const row = [
+        ticket.numero,
+        ticket.categoria,
+        ticket.prioridade,
+        `"${ticket.assunto.replace(/"/g, '""')}"`,
+        `"${ticket.descricao.replace(/"/g, '""')}"`,
+        ticket.status,
+        ticket.solicitante,
+        ticket.setor || '',
+        ticket.created_at,
+        ticket.responsavel || '',
+        ticket.resposta ? `"${ticket.resposta.replace(/"/g, '""')}"` : ''
+      ];
+      csv += row.join(',') + '\\n';
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=tickets.csv');
+    res.send(csv);
+
+  } catch (error) {
+    console.error('Export error:', error);
+    res.status(500).json({ error: 'Erro ao exportar tickets' });
   }
 });
 
