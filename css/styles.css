@@ -5752,7 +5752,7 @@ html {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 40px;
   align-items: start;
 }
@@ -5772,13 +5772,9 @@ html {
 }
 
 .process-step:hover {
-  transform: translateY(-10px);
+  transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(46, 184, 92, 0.15);
   border-color: #2EB85C;
-}
-
-.process-step:not(:last-child)::after {
-  display: none;
 }
 
 .step-number {
@@ -5958,6 +5954,14 @@ html {
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 500;
+}
+
+/* Layout específico para process-timeline */
+@media (max-width: 900px) {
+  .process-timeline {
+    grid-template-columns: 1fr !important;
+    gap: 30px;
+  }
 }
 
 /* Responsividade para Segmentos */
@@ -6234,14 +6238,13 @@ html {
     font-size: 2rem;
   }
 
-  .process-step {
+  .process-timeline {
     grid-template-columns: 1fr;
-    gap: 20px;
-    text-align: center;
+    gap: 30px;
   }
 
-  .process-step:not(:last-child)::after {
-    display: none;
+  .process-step {
+    padding: 25px;
   }
 
   /* Certificações responsivo */
