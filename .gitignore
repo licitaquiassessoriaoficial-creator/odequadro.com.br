@@ -119,3 +119,10 @@ Thumbs.db
 *.swp
 *.swo
 *~
+# Arquivos de backup
+server_*.js
+*.zip
+criar-zip*.ps1
+database.js
+database.sql
+routes-postgres.js
