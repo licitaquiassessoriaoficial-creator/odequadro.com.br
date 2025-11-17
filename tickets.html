@@ -760,10 +760,10 @@
         
         primeiroTipo.addEventListener('change', function() {
           if (this.value === 'gestor') {
-            contratosGroup.style.display = 'block';
+            contratosGroup.classList.remove('form-hidden');
             primeiroContratos.required = true;
           } else {
-            contratosGroup.style.display = 'none';
+            contratosGroup.classList.add('form-hidden');
             primeiroContratos.required = false;
             // Limpar seleção
             Array.from(primeiroContratos.options).forEach(opt => opt.selected = false);
