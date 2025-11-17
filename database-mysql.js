@@ -152,11 +152,11 @@ async function initializeDatabase() {
         INSERT INTO users (cpf, nome, email, senha, role, setor, first_login) VALUES
         (?, ?, ?, ?, ?, ?, ?)
       `, [
-        '43091484840', 'Isabela Nascimento', 'isabela.nascimento@odequadro.com', isabelaPassword, 'dp', 'TI', false
+        '43091484840', 'Isabela Nascimento', 'isabela.nascimento@odequadro.com', isabelaPassword, 'gestor', 'TI', false
       ]);
       
-      console.log('✅ Usuário principal criado (Isabela - TI)');
-      console.log('   CPF: 43091484840, Senha definida, first_login: FALSE');
+      console.log('✅ Usuário principal criado (Isabela - Gestora TI)');
+      console.log('   CPF: 43091484840, Role: gestor, Setor: TI, first_login: FALSE');
     }
     
     console.log('✅ Banco de dados MySQL inicializado');
