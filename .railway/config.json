@@ -1,0 +1,48 @@
+{
+  "projects": {
+    "C:\\BennerKurierWorker": {
+      "projectPath": "C:\\BennerKurierWorker",
+      "name": "shimmering-charisma",
+      "project": "be98ee56-5e63-4dd5-a6f6-797f763f1a89",
+      "environment": "1bafc397-a1ba-4117-b0fa-cebfbe707422",
+      "environmentName": "production",
+      "service": "79e40a51-1926-4b2e-a2e6-654641eb7b7d"
+    },
+    "C:\\Users\\BelaNascimento\\Documents\\clean-project\\apps\\api": {
+      "projectPath": "C:\\Users\\BelaNascimento\\Documents\\clean-project\\apps\\api",
+      "name": "accomplished-illumination",
+      "project": "8e340b76-c87e-4768-9d25-e7f022b29373",
+      "environment": "0755b4b5-2770-4df9-af83-ec62bc5f3db1",
+      "environmentName": "production",
+      "service": "4c8d5d18-1d91-4a22-a435-98642786ed61"
+    },
+    "C:\\Users\\BelaNascimento\\Documents\\novo-web": {
+      "projectPath": "C:\\Users\\BelaNascimento\\Documents\\novo-web",
+      "name": "insightful-abundance",
+      "project": "9971efa7-add8-429e-a9d8-6a3ad24c38d9",
+      "environment": "bc6f4b85-f167-4ec1-b4ad-9f2c6c514302",
+      "environmentName": "production",
+      "service": "f046efd2-68df-4f0b-9e32-0fe67691ecac"
+    },
+    "C:\\Users\\BelaNascimento\\Documents\\novo-web\\apps\\api": {
+      "projectPath": "C:\\Users\\BelaNascimento\\Documents\\novo-web\\apps\\api",
+      "name": "accomplished-illumination",
+      "project": "8e340b76-c87e-4768-9d25-e7f022b29373",
+      "environment": "0755b4b5-2770-4df9-af83-ec62bc5f3db1",
+      "environmentName": "production",
+      "service": "4c8d5d18-1d91-4a22-a435-98642786ed61"
+    },
+    "C:\\Users\\BelaNascimento\\Downloads\\odq": {
+      "projectPath": "C:\\Users\\BelaNascimento\\Downloads\\odq",
+      "name": "giving-heart",
+      "project": "d740dc54-8d65-4642-b8a8-8f28d5d14005",
+      "environment": "e5ef4d28-7b44-4539-aec3-a3749e5a9f8f",
+      "environmentName": "production",
+      "service": "8fd46d54-2ae7-4b54-b5ed-f79c79dbd6bf"
+    }
+  },
+  "user": {
+    "token": "rw_Fe26.2**5e7a4c4aca3d274597c4561fb9358c0f70058b154de601b6f5096ce25a4f750e*KD64SeSTiBcXiFcjuRC3Zw*d2FCp2Fp-VHiAQGNtx85gaauVyHcKPpvEL7cKBvDEYaPcll_Rz49-nCD5PQWO4fTYESvL2yyGa68ocSjLZDjjg*1764170736902*9d971535961da6b3bcb428026bf418b1943721d9f14e71275d6d1e2eab8b8713*Bf0IDU6ydcuZB-g-nDfMGuy_pYacP9YBG33ve6PPWu4"
+  },
+  "linkedFunctions": null
+}

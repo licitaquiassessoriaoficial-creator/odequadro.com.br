@@ -6195,6 +6195,8 @@ html {
   box-shadow: 0 10px 40px rgba(0,0,0,0.15);
   width: 100%;
   max-width: 450px;
+  overflow-y: auto;
+  max-height: 80vh;
 }
 
 .login-header {
@@ -7140,7 +7142,10 @@ html {
 }
 
 .certifications-detailed .section-header {
-  text-align: center;
+  padding: 40px 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
   margin-bottom: 80px;
 }
 
