@@ -408,6 +408,7 @@ body {
   position: relative;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .nav-links a::before {
@@ -8207,6 +8208,52 @@ html {
 
 .vaga-card .btn {
   width: 100%;
+}
+
+/* LinkedIn CTA */
+.linkedin-cta {
+  text-align: center;
+  margin-top: 60px;
+  padding: 40px;
+  background: linear-gradient(135deg, #0077B5, #005885);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 119, 181, 0.3);
+}
+
+.btn-linkedin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--color-white);
+  color: #0077B5;
+  padding: 18px 40px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border: 3px solid transparent;
+}
+
+.btn-linkedin:hover {
+  background: #0077B5;
+  color: var(--color-white);
+  border-color: var(--color-white);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.btn-linkedin i {
+  font-size: 1.5rem;
+}
+
+.linkedin-subtitle {
+  color: var(--color-white);
+  margin-top: 15px;
+  font-size: 0.95rem;
+  opacity: 0.95;
 }
 
 /* Responsive */
