@@ -6196,7 +6196,7 @@ html {
   width: 100%;
   max-width: 450px;
   overflow-y: auto;
-  max-height: 80vh;
+  max-height: 95vh;
 }
 
 .login-header {
