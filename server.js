@@ -9,6 +9,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'odequadro_secret_key_2025';
 
+// CPFs autorizados para Departamento Pessoal (DP)
+const AUTHORIZED_DP_CPFS = [
+  '12345678901', // Admin Sistema (teste)
+  // Adicione aqui os CPFs autorizados para acessar o DP
+];
+
 // Middleware para arquivos estáticos
 app.use(express.static('.'));
 
@@ -183,6 +189,13 @@ app.post('/api/login', async (req, res) => {
     
     const cleanCPF = cpf.replace(/\D/g, '');
     
+    // Validar se CPF está autorizado para DP (apenas no login)
+    if (role === 'dp' && !AUTHORIZED_DP_CPFS.includes(cleanCPF)) {
+      return res.status(403).json({ 
+        error: 'Acesso negado. CPF não autorizado para o Departamento Pessoal.' 
+      });
+    }
+    
     const [rows] = await pool.query(
       'SELECT * FROM users WHERE cpf = ? AND role = ?',
       [cleanCPF, role]
@@ -240,6 +253,13 @@ app.post('/api/register', async (req, res) => {
     
     if (cleanCPF.length !== 11) {
       return res.status(400).json({ error: 'CPF deve ter 11 dígitos' });
+    }
+    
+    // Validar se CPF está autorizado para DP
+    if (role === 'dp' && !AUTHORIZED_DP_CPFS.includes(cleanCPF)) {
+      return res.status(403).json({ 
+        error: 'CPF não autorizado para acesso ao Departamento Pessoal. Entre em contato com a administração.' 
+      });
     }
     
     // Verificar se usuário já existe
@@ -493,6 +513,59 @@ app.get('/api/tickets/:id', authenticateToken, async (req, res) => {
     
   } catch (error) {
     console.error('Get ticket error:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// DP adicionar resposta ao ticket
+app.put('/api/tickets/:id/resposta', authenticateToken, async (req, res) => {
+  try {
+    const ticketId = parseInt(req.params.id);
+    const { resposta } = req.body;
+    const user = req.user;
+    
+    if (!resposta || !resposta.trim()) {
+      return res.status(400).json({ error: 'Resposta é obrigatória' });
+    }
+    
+    // Apenas DP e gestores podem adicionar resposta
+    if (user.role === 'colaborador') {
+      return res.status(403).json({ error: 'Sem permissão para adicionar resposta' });
+    }
+    
+    // Verificar se ticket existe
+    const [checkRows] = await pool.query('SELECT id FROM tickets WHERE id = ?', [ticketId]);
+    
+    if (checkRows.length === 0) {
+      return res.status(404).json({ error: 'Ticket não encontrado' });
+    }
+    
+    // Atualizar resposta e atribuir responsável se necessário
+    const [currentTicket] = await pool.query('SELECT assigned_id FROM tickets WHERE id = ?', [ticketId]);
+    const shouldAssign = currentTicket[0].assigned_id === null;
+    
+    if (shouldAssign) {
+      await pool.query(
+        'UPDATE tickets SET resposta = ?, assigned_id = ?, status = \'em-andamento\' WHERE id = ?',
+        [resposta.trim(), user.id, ticketId]
+      );
+    } else {
+      await pool.query(
+        'UPDATE tickets SET resposta = ? WHERE id = ?',
+        [resposta.trim(), ticketId]
+      );
+    }
+    
+    const [ticketRows] = await pool.query('SELECT * FROM tickets WHERE id = ?', [ticketId]);
+    
+    res.json({
+      success: true,
+      message: 'Resposta adicionada com sucesso',
+      ticket: ticketRows[0]
+    });
+    
+  } catch (error) {
+    console.error('Add resposta error:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });

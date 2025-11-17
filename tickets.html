@@ -1244,8 +1244,17 @@
               </div>
               ${ticket.resposta ? `
                 <div class="ticket-response">
-                  <strong>Resposta:</strong>
+                  <strong>Resposta do Departamento:</strong>
                   <p>${ticket.resposta}</p>
+                </div>
+              ` : ''}
+              ${(currentUserRole === 'dp' || currentUserRole === 'gestor') && !ticket.resposta ? `
+                <div class="ticket-response-form">
+                  <strong>Adicionar Resposta:</strong>
+                  <textarea id="respostaTexto" placeholder="Digite a resposta oficial para este ticket..." maxlength="1000" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; margin-top: 10px;"></textarea>
+                  <button onclick="addResposta(${ticket.id})" class="btn-primary" style="margin-top: 10px;">
+                    <i class="fas fa-reply"></i> Enviar Resposta
+                  </button>
                 </div>
               ` : ''}
               ${ticket.comments && ticket.comments.length > 0 ? `
@@ -1277,6 +1286,46 @@
 
       function closeTicketDetailModal() {
         document.getElementById('ticketDetailModal').classList.remove('modal-active');
+      }
+
+      // Adicionar resposta ao ticket (DP/Gestor)
+      async function addResposta(ticketId) {
+        const respostaTexto = document.getElementById('respostaTexto').value.trim();
+        
+        if (!respostaTexto) {
+          alert('Por favor, digite uma resposta');
+          return;
+        }
+        
+        if (respostaTexto.length < 10) {
+          alert('A resposta deve ter pelo menos 10 caracteres');
+          return;
+        }
+        
+        try {
+          const response = await fetch(`${API_BASE}/tickets/${ticketId}/resposta`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ resposta: respostaTexto })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            alert('Resposta adicionada com sucesso!');
+            closeTicketDetailModal();
+            loadTickets();
+            loadDashboardStats();
+          } else {
+            alert(data.error || 'Erro ao adicionar resposta');
+          }
+        } catch (error) {
+          console.error('Add resposta error:', error);
+          alert('Erro de conexão');
+        }
       }
 
       function refreshTickets() {
