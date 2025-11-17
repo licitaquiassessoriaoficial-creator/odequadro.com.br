@@ -8,8 +8,26 @@ let poolConfig;
 
 if (databaseUrl) {
   // Railway fornece URL no formato: mysql://user:password@host:port/database
-  // mysql2 aceita a URL diretamente como string
-  poolConfig = databaseUrl;
+  // Parsear manualmente para garantir compatibilidade
+  try {
+    const url = new URL(databaseUrl);
+    poolConfig = {
+      host: url.hostname,
+      port: url.port || 3306,
+      user: url.username,
+      password: url.password,
+      database: url.pathname.slice(1), // Remove "/" do início
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0
+    };
+    console.log(`🔧 Conectando ao MySQL em ${url.hostname}:${url.port || 3306}`);
+  } catch (error) {
+    console.error('❌ Erro ao parsear MYSQL_URL:', error);
+    throw error;
+  }
 } else {
   // Desenvolvimento local
   poolConfig = {

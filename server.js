@@ -442,18 +442,11 @@ app.get('/api/tickets', authenticateToken, async (req, res) => {
 // Criar ticket
 app.post('/api/tickets', authenticateToken, async (req, res) => {
   try {
-    const { categoria, prioridade, assunto, descricao } = req.body;
+    const { setor, categoria, prioridade, assunto, descricao } = req.body;
     const user = req.user;
     
-    if (!categoria || !prioridade || !assunto || !descricao) {
+    if (!setor || !categoria || !prioridade || !assunto || !descricao) {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
-    }
-    
-    // Buscar setor do usuário
-    const [userRows] = await pool.query('SELECT setor FROM users WHERE id = ?', [user.id]);
-    
-    if (userRows.length === 0) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
     }
     
     const numero = await generateTicketNumber();
@@ -461,7 +454,7 @@ app.post('/api/tickets', authenticateToken, async (req, res) => {
     const [result] = await pool.query(
       `INSERT INTO tickets (numero, solicitante_id, categoria, prioridade, assunto, descricao, setor)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [numero, user.id, categoria, prioridade, assunto.trim(), descricao.trim(), userRows[0].setor]
+      [numero, user.id, categoria, prioridade, assunto.trim(), descricao.trim(), setor]
     );
     
     const [ticketRows] = await pool.query('SELECT * FROM tickets WHERE id = ?', [result.insertId]);
