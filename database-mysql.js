@@ -1,18 +1,19 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 
-// Configuração do MySQL - Railway fornece MYSQL_URL ou DATABASE_URL
+// Configuração do MySQL - Railway pode fornecer URL ou variáveis separadas
 const databaseUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
 
 console.log('🔍 Verificando variáveis de ambiente...');
 console.log('MYSQL_URL presente:', !!process.env.MYSQL_URL);
 console.log('DATABASE_URL presente:', !!process.env.DATABASE_URL);
+console.log('MYSQLHOST presente:', !!process.env.MYSQLHOST);
+console.log('MYSQLUSER presente:', !!process.env.MYSQLUSER);
 
 let poolConfig;
 
 if (databaseUrl) {
-  // Railway fornece URL no formato: mysql://user:password@host:port/database
-  // Parsear manualmente para garantir compatibilidade
+  // Opção 1: Usar URL completa
   try {
     const url = new URL(databaseUrl);
     poolConfig = {
@@ -20,7 +21,7 @@ if (databaseUrl) {
       port: parseInt(url.port) || 3306,
       user: url.username,
       password: url.password,
-      database: url.pathname.slice(1), // Remove "/" do início
+      database: url.pathname.slice(1),
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
@@ -32,10 +33,27 @@ if (databaseUrl) {
     console.log(`📊 Database: ${url.pathname.slice(1)}`);
     console.log(`👤 User: ${url.username}`);
   } catch (error) {
-    console.error('❌ Erro ao parsear MYSQL_URL:', error);
-    console.error('URL recebida:', databaseUrl);
+    console.error('❌ Erro ao parsear URL:', error);
     throw error;
   }
+} else if (process.env.MYSQLHOST) {
+  // Opção 2: Usar variáveis separadas do Railway
+  poolConfig = {
+    host: process.env.MYSQLHOST,
+    port: parseInt(process.env.MYSQLPORT) || 3306,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE || 'railway',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+    connectTimeout: 10000
+  };
+  console.log(`🔧 Conectando ao MySQL em ${process.env.MYSQLHOST}:${process.env.MYSQLPORT || 3306}`);
+  console.log(`📊 Database: ${process.env.MYSQLDATABASE || 'railway'}`);
+  console.log(`👤 User: ${process.env.MYSQLUSER}`);
 } else {
   console.log('⚠️ Nenhuma URL de banco configurada, usando localhost');
   // Desenvolvimento local
