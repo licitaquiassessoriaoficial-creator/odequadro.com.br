@@ -142,6 +142,35 @@
                   </select>
                 </div>
                 
+                <div class="form-group" id="contratosGroup" style="display: none;">
+                  <label for="primeiroContratos">Contrato(s) que Gerencia</label>
+                  <select id="primeiroContratos" name="contratos" multiple size="8">
+                    <option value="ADM CAMP">ADM CAMP</option>
+                    <option value="ESUP">ESUP</option>
+                    <option value="FURP">FURP</option>
+                    <option value="METRÔ FIS">METRÔ FIS</option>
+                    <option value="METRÔ JABA">METRÔ JABA</option>
+                    <option value="P80">P80</option>
+                    <option value="REPLAN">REPLAN</option>
+                    <option value="REVAP">REVAP</option>
+                    <option value="TJSP">TJSP</option>
+                    <option value="TRANSP JURI">TRANSP JURI</option>
+                    <option value="TRANSP LOG">TRANSP LOG</option>
+                    <option value="UNESP INTERIOR">UNESP INTERIOR</option>
+                    <option value="ESCRITÓRIO CENTRAL">ESCRITÓRIO CENTRAL</option>
+                    <option value="REPLAN CAMPINAS">REPLAN CAMPINAS</option>
+                    <option value="P-80">P-80</option>
+                    <option value="METRÔ (ANÁLISE)">METRÔ (ANÁLISE)</option>
+                    <option value="TJ - MOTORISTAS">TJ - MOTORISTAS</option>
+                    <option value="METRÔ ECONÔMICO">METRÔ ECONÔMICO</option>
+                    <option value="ENGENHARIA SS">ENGENHARIA SS</option>
+                    <option value="TRANSPETRO LOGISTICA">TRANSPETRO LOGISTICA</option>
+                  </select>
+                  <small style="color: #666; font-size: 0.85em; margin-top: 4px; display: block;">
+                    Segure Ctrl (Windows) ou Cmd (Mac) para selecionar múltiplos contratos
+                  </small>
+                </div>
+                
                 <div class="form-group">
                   <label for="primeiroSenha">Nova Senha</label>
                   <input type="password" id="primeiroSenha" name="senha" placeholder="Mínimo 6 caracteres" maxlength="50" minlength="6" required>
@@ -419,6 +448,33 @@
           
           <form class="ticket-form" id="newTicketForm">
             <div class="form-group">
+              <label for="contrato">Contrato</label>
+              <select id="contrato" name="contrato" required>
+                <option value="">Selecione o contrato</option>
+                <option value="ADM CAMP">ADM CAMP</option>
+                <option value="ESUP">ESUP</option>
+                <option value="FURP">FURP</option>
+                <option value="METRÔ FIS">METRÔ FIS</option>
+                <option value="METRÔ JABA">METRÔ JABA</option>
+                <option value="P80">P80</option>
+                <option value="REPLAN">REPLAN</option>
+                <option value="REVAP">REVAP</option>
+                <option value="TJSP">TJSP</option>
+                <option value="TRANSP JURI">TRANSP JURI</option>
+                <option value="TRANSP LOG">TRANSP LOG</option>
+                <option value="UNESP INTERIOR">UNESP INTERIOR</option>
+                <option value="ESCRITÓRIO CENTRAL">ESCRITÓRIO CENTRAL</option>
+                <option value="REPLAN CAMPINAS">REPLAN CAMPINAS</option>
+                <option value="P-80">P-80</option>
+                <option value="METRÔ (ANÁLISE)">METRÔ (ANÁLISE)</option>
+                <option value="TJ - MOTORISTAS">TJ - MOTORISTAS</option>
+                <option value="METRÔ ECONÔMICO">METRÔ ECONÔMICO</option>
+                <option value="ENGENHARIA SS">ENGENHARIA SS</option>
+                <option value="TRANSPETRO LOGISTICA">TRANSPETRO LOGISTICA</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
               <label for="setor">Setor de Destino</label>
               <select id="setor" name="setor" required>
                 <option value="">Selecione o setor responsável</option>
@@ -687,6 +743,23 @@
           });
         });
 
+        // Mostrar/ocultar campo de contratos baseado no tipo de usuário
+        const primeiroTipo = document.getElementById('primeiroTipo');
+        const contratosGroup = document.getElementById('contratosGroup');
+        const primeiroContratos = document.getElementById('primeiroContratos');
+        
+        primeiroTipo.addEventListener('change', function() {
+          if (this.value === 'gestor') {
+            contratosGroup.style.display = 'block';
+            primeiroContratos.required = true;
+          } else {
+            contratosGroup.style.display = 'none';
+            primeiroContratos.required = false;
+            // Limpar seleção
+            Array.from(primeiroContratos.options).forEach(opt => opt.selected = false);
+          }
+        });
+
         // Login form
         loginForm.addEventListener('submit', async function(e) {
           e.preventDefault();
@@ -860,13 +933,28 @@
             return;
           }
           
+          // Capturar contratos selecionados (se for gestor)
+          let contratos = null;
+          if (role === 'gestor') {
+            const contratosSelect = document.getElementById('primeiroContratos');
+            const selectedOptions = Array.from(contratosSelect.selectedOptions).map(opt => opt.value);
+            
+            if (selectedOptions.length === 0) {
+              alert('Gestores devem selecionar pelo menos um contrato');
+              return;
+            }
+            
+            contratos = selectedOptions.join(',');
+          }
+          
           const userData = {
             cpf: formData.get('cpf').replace(/\D/g, ''), // Remove máscara do CPF
             nome: formData.get('nome').trim(),
             email: formData.get('email').trim(),
             senha: senha,
             role: formData.get('role'),
-            setor: formData.get('setor')
+            setor: formData.get('setor'),
+            contratos: contratos
           };
 
           try {
@@ -1353,6 +1441,7 @@
         
         const formData = new FormData(this);
         const ticketData = {
+          contrato: formData.get('contrato'),
           setor: formData.get('setor'),
           categoria: formData.get('categoria'),
           prioridade: formData.get('prioridade'),

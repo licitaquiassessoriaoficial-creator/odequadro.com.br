@@ -275,7 +275,7 @@ app.post('/api/login', async (req, res) => {
 // Registro/Cadastro
 app.post('/api/register', async (req, res) => {
   try {
-    const { cpf, nome, email, senha, role, setor } = req.body;
+    const { cpf, nome, email, senha, role, setor, contratos } = req.body;
     
     if (!cpf || !nome || !email || !senha || !role || !setor) {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
@@ -301,6 +301,13 @@ app.post('/api/register', async (req, res) => {
       });
     }
     
+    // Validar se gestor selecionou pelo menos um contrato
+    if (role === 'gestor' && (!contratos || contratos.trim() === '')) {
+      return res.status(400).json({ 
+        error: 'Gestores devem selecionar pelo menos um contrato.' 
+      });
+    }
+    
     // Verificar se usuário já existe
     const [existing] = await pool.query(
       'SELECT id FROM users WHERE cpf = ?',
@@ -314,12 +321,12 @@ app.post('/api/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(senha, 10);
     
     const [result] = await pool.query(
-      'INSERT INTO users (cpf, nome, email, senha, role, setor) VALUES (?, ?, ?, ?, ?, ?)',
-      [cleanCPF, nome.trim(), email.trim(), hashedPassword, role, setor]
+      'INSERT INTO users (cpf, nome, email, senha, role, setor, contratos) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [cleanCPF, nome.trim(), email.trim(), hashedPassword, role, setor, contratos]
     );
     
     const [newUser] = await pool.query(
-      'SELECT id, cpf, nome, email, role, setor, created_at FROM users WHERE id = ?',
+      'SELECT id, cpf, nome, email, role, setor, contratos, created_at FROM users WHERE id = ?',
       [result.insertId]
     );
     
@@ -446,11 +453,16 @@ app.get('/api/tickets', authenticateToken, async (req, res) => {
       conditions.push('t.solicitante_id = ?');
       params.push(user.id);
     } else if (user.role === 'gestor') {
-      // Buscar setor do usuário
-      const [userRows] = await pool.query('SELECT setor FROM users WHERE id = ?', [user.id]);
-      if (userRows.length > 0) {
-        conditions.push('t.setor = ?');
-        params.push(userRows[0].setor);
+      // Buscar contratos do gestor
+      const [userRows] = await pool.query('SELECT contratos FROM users WHERE id = ?', [user.id]);
+      if (userRows.length > 0 && userRows[0].contratos) {
+        // Converter string de contratos em array
+        const gestorContratos = userRows[0].contratos.split(',').map(c => c.trim());
+        
+        // Criar condição WHERE IN para múltiplos contratos
+        const placeholders = gestorContratos.map(() => '?').join(',');
+        conditions.push(`t.contrato IN (${placeholders})`);
+        params.push(...gestorContratos);
       }
     }
     // DP vê todos os tickets
@@ -493,19 +505,19 @@ app.get('/api/tickets', authenticateToken, async (req, res) => {
 // Criar ticket
 app.post('/api/tickets', authenticateToken, async (req, res) => {
   try {
-    const { setor, categoria, prioridade, assunto, descricao } = req.body;
+    const { contrato, setor, categoria, prioridade, assunto, descricao } = req.body;
     const user = req.user;
     
-    if (!setor || !categoria || !prioridade || !assunto || !descricao) {
+    if (!contrato || !setor || !categoria || !prioridade || !assunto || !descricao) {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
     }
     
     const numero = await generateTicketNumber();
     
     const [result] = await pool.query(
-      `INSERT INTO tickets (numero, solicitante_id, categoria, prioridade, assunto, descricao, setor)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [numero, user.id, categoria, prioridade, assunto.trim(), descricao.trim(), setor]
+      `INSERT INTO tickets (numero, solicitante_id, categoria, prioridade, assunto, descricao, setor, contrato)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [numero, user.id, categoria, prioridade, assunto.trim(), descricao.trim(), setor, contrato]
     );
     
     const [ticketRows] = await pool.query('SELECT * FROM tickets WHERE id = ?', [result.insertId]);
