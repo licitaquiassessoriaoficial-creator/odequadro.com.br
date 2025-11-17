@@ -4,6 +4,10 @@ const bcrypt = require('bcryptjs');
 // Configuração do MySQL - Railway fornece MYSQL_URL ou DATABASE_URL
 const databaseUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
 
+console.log('🔍 Verificando variáveis de ambiente...');
+console.log('MYSQL_URL presente:', !!process.env.MYSQL_URL);
+console.log('DATABASE_URL presente:', !!process.env.DATABASE_URL);
+
 let poolConfig;
 
 if (databaseUrl) {
@@ -13,7 +17,7 @@ if (databaseUrl) {
     const url = new URL(databaseUrl);
     poolConfig = {
       host: url.hostname,
-      port: url.port || 3306,
+      port: parseInt(url.port) || 3306,
       user: url.username,
       password: url.password,
       database: url.pathname.slice(1), // Remove "/" do início
@@ -21,14 +25,19 @@ if (databaseUrl) {
       connectionLimit: 10,
       queueLimit: 0,
       enableKeepAlive: true,
-      keepAliveInitialDelay: 0
+      keepAliveInitialDelay: 0,
+      connectTimeout: 10000
     };
     console.log(`🔧 Conectando ao MySQL em ${url.hostname}:${url.port || 3306}`);
+    console.log(`📊 Database: ${url.pathname.slice(1)}`);
+    console.log(`👤 User: ${url.username}`);
   } catch (error) {
     console.error('❌ Erro ao parsear MYSQL_URL:', error);
+    console.error('URL recebida:', databaseUrl);
     throw error;
   }
 } else {
+  console.log('⚠️ Nenhuma URL de banco configurada, usando localhost');
   // Desenvolvimento local
   poolConfig = {
     host: 'localhost',
