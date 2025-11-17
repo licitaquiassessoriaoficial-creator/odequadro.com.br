@@ -7887,6 +7887,107 @@ html {
    TRABALHE CONOSCO PAGE
    ======================================== */
 
+/* ========================================
+   TRABALHE CONOSCO PAGE
+   ======================================== */
+
+/* Hero Trabalhe Conosco */
+.hero-trabalhe-conosco {
+  position: relative;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(46, 184, 92, 0.9), rgba(44, 90, 160, 0.9)),
+              url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--color-white);
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.hero-trabalhe-conosco .hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+.hero-trabalhe-conosco .container {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-trabalhe-conosco h1 {
+  font-size: 4rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+  letter-spacing: -1px;
+}
+
+.hero-trabalhe-conosco .hero-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 40px;
+  opacity: 0.95;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.btn-hero-primary,
+.btn-hero-secondary {
+  padding: 18px 40px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn-hero-primary {
+  background: var(--color-white);
+  color: var(--color-primary);
+}
+
+.btn-hero-primary:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.btn-hero-secondary {
+  background: transparent;
+  color: var(--color-white);
+  border: 3px solid var(--color-white);
+}
+
+.btn-hero-secondary:hover {
+  background: var(--color-white);
+  color: var(--color-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
 .trabalhe-conosco-section {
   padding: 80px 0;
   background-color: var(--color-gray-100);
@@ -8258,6 +8359,30 @@ html {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .hero-trabalhe-conosco {
+    min-height: 500px;
+    padding: 60px 20px;
+  }
+  
+  .hero-trabalhe-conosco h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-trabalhe-conosco .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .hero-cta {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .btn-hero-primary,
+  .btn-hero-secondary {
+    width: 100%;
+    max-width: 300px;
+  }
+  
   .trabalhe-conosco-section {
     padding: 40px 0;
   }

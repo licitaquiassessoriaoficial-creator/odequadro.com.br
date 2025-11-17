@@ -908,9 +908,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-  }
-});
-
 // Rota para receber currículos (Trabalhe Conosco)
 app.post('/api/curriculos', express.json(), async (req, res) => {
   try {
