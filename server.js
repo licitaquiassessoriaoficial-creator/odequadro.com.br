@@ -21,8 +21,9 @@ const AUTHORIZED_GESTOR_CPFS = [
   '98765432101', // Gestor Teste
   '26346512870', // Robinson - Diretor ODQ (acesso total)
   '43091484840', // Isabela Nascimento - Gestora TI
+  '16514242847', // Clara Nave - Gestora
   // Adicione aqui os CPFs dos gestores:
-  // Rafael (TI), Adriano Bonfim, Clara Nave, Alexandre Marçal, Cristiane Silva
+  // Rafael (TI), Adriano Bonfim, Alexandre Marçal, Cristiane Silva
 ];
 
 // Middleware para arquivos estáticos
@@ -245,6 +246,17 @@ app.post('/api/login', async (req, res) => {
     
     const { senha: _, ...userWithoutPassword } = user;
     
+    // Verificar se é primeiro login (apenas para DP e Gestor)
+    if (user.first_login && (user.role === 'dp' || user.role === 'gestor')) {
+      return res.json({
+        success: true,
+        token,
+        user: userWithoutPassword,
+        requirePasswordChange: true,
+        message: 'Primeiro acesso detectado. Por favor, altere sua senha.'
+      });
+    }
+    
     res.json({
       success: true,
       token,
@@ -371,6 +383,38 @@ app.post('/api/password-reset/update', async (req, res) => {
     
   } catch (error) {
     console.error('Password update error:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// Atualização de senha do primeiro acesso (marca first_login como false)
+app.post('/api/change-first-password', authenticateToken, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    const user = req.user;
+    
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: 'A nova senha deve ter no mínimo 6 caracteres' });
+    }
+    
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    const [result] = await pool.query(
+      'UPDATE users SET senha = ?, first_login = FALSE WHERE id = ?',
+      [hashedPassword, user.id]
+    );
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Senha alterada com sucesso! Faça login novamente com a nova senha.'
+    });
+    
+  } catch (error) {
+    console.error('Change first password error:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });

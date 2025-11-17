@@ -89,6 +89,7 @@ async function initializeDatabase() {
         senha VARCHAR(255) NOT NULL,
         role ENUM('colaborador', 'gestor', 'dp') NOT NULL,
         setor VARCHAR(100),
+        first_login BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_cpf (cpf),
