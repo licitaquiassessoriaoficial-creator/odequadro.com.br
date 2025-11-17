@@ -145,44 +145,18 @@ async function initializeDatabase() {
     if (users[0].count === 0) {
       console.log('📝 Criando usuários iniciais...');
       
-      // Criar usuários de teste
-      const hashedPassword1 = await bcrypt.hash('123456', 10);
-      const hashedPassword2 = await bcrypt.hash('123456', 10);
+      // Criar usuário principal (Isabela - não precisa redefinir senha)
+      const isabelaPassword = await bcrypt.hash('230919', 10);
       
       await connection.query(`
-        INSERT INTO users (cpf, nome, email, senha, role, setor) VALUES
-        (?, ?, ?, ?, ?, ?),
-        (?, ?, ?, ?, ?, ?)
+        INSERT INTO users (cpf, nome, email, senha, role, setor, first_login) VALUES
+        (?, ?, ?, ?, ?, ?, ?)
       `, [
-        '12345678901', 'Admin Sistema', 'admin@odequadro.com', hashedPassword1, 'dp', 'Departamento Pessoal',
-        '98765432101', 'Gestor Teste', 'gestor@odequadro.com', hashedPassword2, 'gestor', 'Facilities'
+        '43091484840', 'Isabela Nascimento', 'isabela.nascimento@odequadro.com', isabelaPassword, 'dp', 'TI', false
       ]);
       
-      console.log('✅ Usuários de teste criados');
-      console.log('   Admin DP: CPF 12345678901, Senha: 123456');
-      console.log('   Gestor: CPF 98765432101, Senha: 123456');
-      
-      // Criar ticket de exemplo
-      const [adminUser] = await connection.query('SELECT id FROM users WHERE cpf = ?', ['12345678901']);
-      const [gestorUser] = await connection.query('SELECT id FROM users WHERE cpf = ?', ['98765432101']);
-      
-      if (adminUser.length > 0 && gestorUser.length > 0) {
-        await connection.query(`
-          INSERT INTO tickets (numero, solicitante_id, categoria, prioridade, assunto, descricao, status, setor, assigned_id)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-          'ODQ001',
-          gestorUser[0].id,
-          'ponto',
-          'media',
-          'Correção no ponto eletrônico',
-          'Preciso corrigir o horário de entrada do dia 10/11/2025',
-          'aberto',
-          'Facilities',
-          adminUser[0].id
-        ]);
-        console.log('✅ Ticket de exemplo criado');
-      }
+      console.log('✅ Usuário principal criado (Isabela - TI)');
+      console.log('   CPF: 43091484840, Senha definida, first_login: FALSE');
     }
     
     console.log('✅ Banco de dados MySQL inicializado');
