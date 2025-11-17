@@ -3,7 +3,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');
+const { pool, initializeDatabase } = require('./database-mysql');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,53 +29,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// ===== BANCO DE DADOS EM MEMÓRIA =====
-let users = [
-  {
-    id: 1,
-    cpf: '12345678901',
-    nome: 'Admin Sistema',
-    email: 'admin@odequadro.com',
-    senha: bcrypt.hashSync('123456', 10),
-    role: 'dp',
-    setor: 'Departamento Pessoal',
-    created_at: new Date()
-  },
-  {
-    id: 2,
-    cpf: '98765432101',
-    nome: 'Gestor Teste',
-    email: 'gestor@odequadro.com',
-    senha: bcrypt.hashSync('123456', 10),
-    role: 'gestor',
-    setor: 'Facilities',
-    created_at: new Date()
-  }
-];
-
-let tickets = [
-  {
-    id: 1,
-    numero: 'ODQ001',
-    solicitante_id: 2,
-    solicitante_nome: 'Gestor Teste',
-    categoria: 'ponto',
-    prioridade: 'media',
-    assunto: 'Correção no ponto eletrônico',
-    descricao: 'Preciso corrigir o horário de entrada do dia 10/11/2025',
-    status: 'aberto',
-    setor: 'Facilities',
-    resposta: null,
-    assigned_id: 1,
-    assigned_nome: 'Admin Sistema',
-    created_at: new Date('2025-11-10T08:30:00'),
-    updated_at: new Date('2025-11-10T08:30:00'),
-    comments: []
-  }
-];
-
-let ticketCounter = 2;
-
 // ===== MIDDLEWARE DE AUTENTICAÇÃO =====
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -95,17 +48,23 @@ function authenticateToken(req, res, next) {
 }
 
 // ===== HELPER FUNCTIONS =====
-function generateTicketNumber() {
-  const num = String(ticketCounter).padStart(3, '0');
-  return `ODQ${num}`;
-}
-
-function getUserById(id) {
-  return users.find(user => user.id === parseInt(id));
-}
-
-function getUserByCPF(cpf) {
-  return users.find(user => user.cpf === cpf.replace(/\D/g, ''));
+async function generateTicketNumber() {
+  try {
+    const [rows] = await pool.query(
+      'SELECT numero FROM tickets ORDER BY id DESC LIMIT 1'
+    );
+    
+    if (rows.length === 0) {
+      return 'ODQ001';
+    }
+    
+    const lastNumber = rows[0].numero;
+    const num = parseInt(lastNumber.replace('ODQ', '')) + 1;
+    return `ODQ${String(num).padStart(3, '0')}`;
+  } catch (error) {
+    console.error('Error generating ticket number:', error);
+    return 'ODQ001';
+  }
 }
 
 // ===== ROTAS ESTÁTICAS =====
@@ -169,6 +128,10 @@ app.get('/tickets', (req, res) => {
   res.sendFile(path.join(__dirname, 'tickets.html'));
 });
 
+app.get('/faq', (req, res) => {
+  res.sendFile(path.join(__dirname, 'faq.html'));
+});
+
 // Rotas de artigos
 app.get('/artigo-campinas-imoveis', (req, res) => {
   res.sendFile(path.join(__dirname, 'artigo-campinas-imoveis.html'));
@@ -204,7 +167,7 @@ app.get('/artigo-sustentabilidade-construcao', (req, res) => {
 app.get('/api/test', (req, res) => {
   res.json({ 
     success: true, 
-    message: 'API funcionando!', 
+    message: 'API funcionando com MySQL no Railway!', 
     timestamp: new Date().toISOString() 
   });
 });
@@ -219,20 +182,22 @@ app.post('/api/login', async (req, res) => {
     }
     
     const cleanCPF = cpf.replace(/\D/g, '');
-    const user = getUserByCPF(cleanCPF);
     
-    if (!user) {
+    const [rows] = await pool.query(
+      'SELECT * FROM users WHERE cpf = ? AND role = ?',
+      [cleanCPF, role]
+    );
+    
+    if (rows.length === 0) {
       return res.status(401).json({ 
         error: 'Usuário não encontrado', 
         needsRegistration: true 
       });
     }
     
-    if (user.role !== role) {
-      return res.status(401).json({ error: 'Tipo de usuário incorreto' });
-    }
-    
+    const user = rows[0];
     const validPassword = await bcrypt.compare(senha, user.senha);
+    
     if (!validPassword) {
       return res.status(401).json({ error: 'Senha incorreta' });
     }
@@ -277,32 +242,32 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ error: 'CPF deve ter 11 dígitos' });
     }
     
-    const existingUser = getUserByCPF(cleanCPF);
-    if (existingUser) {
+    // Verificar se usuário já existe
+    const [existing] = await pool.query(
+      'SELECT id FROM users WHERE cpf = ?',
+      [cleanCPF]
+    );
+    
+    if (existing.length > 0) {
       return res.status(400).json({ error: 'Usuário já cadastrado' });
     }
     
     const hashedPassword = await bcrypt.hash(senha, 10);
     
-    const newUser = {
-      id: users.length + 1,
-      cpf: cleanCPF,
-      nome: nome.trim(),
-      email: email.trim(),
-      senha: hashedPassword,
-      role,
-      setor,
-      created_at: new Date()
-    };
+    const [result] = await pool.query(
+      'INSERT INTO users (cpf, nome, email, senha, role, setor) VALUES (?, ?, ?, ?, ?, ?)',
+      [cleanCPF, nome.trim(), email.trim(), hashedPassword, role, setor]
+    );
     
-    users.push(newUser);
-    
-    const { senha: _, ...userWithoutPassword } = newUser;
+    const [newUser] = await pool.query(
+      'SELECT id, cpf, nome, email, role, setor, created_at FROM users WHERE id = ?',
+      [result.insertId]
+    );
     
     res.status(201).json({
       success: true,
       message: 'Usuário cadastrado com sucesso',
-      user: userWithoutPassword
+      user: newUser[0]
     });
     
   } catch (error) {
@@ -317,17 +282,19 @@ app.post('/api/password-reset/verify', async (req, res) => {
     const { cpf, role } = req.body;
     
     const cleanCPF = cpf.replace(/\D/g, '');
-    const user = getUserByCPF(cleanCPF);
     
-    if (!user || user.role !== role) {
+    const [rows] = await pool.query(
+      'SELECT id, cpf, nome, email, role, setor FROM users WHERE cpf = ? AND role = ?',
+      [cleanCPF, role]
+    );
+    
+    if (rows.length === 0) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
     
-    const { senha: _, ...userWithoutPassword } = user;
-    
     res.json({
       success: true,
-      user: userWithoutPassword
+      user: rows[0]
     });
     
   } catch (error) {
@@ -342,14 +309,16 @@ app.post('/api/password-reset/update', async (req, res) => {
     const { cpf, role, newPassword } = req.body;
     
     const cleanCPF = cpf.replace(/\D/g, '');
-    const userIndex = users.findIndex(u => u.cpf === cleanCPF && u.role === role);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
     
-    if (userIndex === -1) {
+    const [result] = await pool.query(
+      'UPDATE users SET senha = ? WHERE cpf = ? AND role = ?',
+      [hashedPassword, cleanCPF, role]
+    );
+    
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
-    
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    users[userIndex].senha = hashedPassword;
     
     res.json({
       success: true,
@@ -363,33 +332,66 @@ app.post('/api/password-reset/update', async (req, res) => {
 });
 
 // Listar tickets
-app.get('/api/tickets', authenticateToken, (req, res) => {
+app.get('/api/tickets', authenticateToken, async (req, res) => {
   try {
     const { status } = req.query;
     const user = req.user;
     
-    let filteredTickets = tickets;
+    let query = `
+      SELECT 
+        t.*,
+        u1.nome as solicitante_nome,
+        u2.nome as assigned_nome
+      FROM tickets t
+      LEFT JOIN users u1 ON t.solicitante_id = u1.id
+      LEFT JOIN users u2 ON t.assigned_id = u2.id
+    `;
+    
+    const conditions = [];
+    const params = [];
     
     // Filtrar por role
     if (user.role === 'colaborador') {
-      filteredTickets = tickets.filter(ticket => ticket.solicitante_id === user.id);
+      conditions.push('t.solicitante_id = ?');
+      params.push(user.id);
     } else if (user.role === 'gestor') {
-      const userRecord = getUserById(user.id);
-      if (userRecord) {
-        filteredTickets = tickets.filter(ticket => ticket.setor === userRecord.setor);
+      // Buscar setor do usuário
+      const [userRows] = await pool.query('SELECT setor FROM users WHERE id = ?', [user.id]);
+      if (userRows.length > 0) {
+        conditions.push('t.setor = ?');
+        params.push(userRows[0].setor);
       }
     }
     // DP vê todos os tickets
     
     // Filtrar por status se especificado
     if (status) {
-      filteredTickets = filteredTickets.filter(ticket => ticket.status === status);
+      conditions.push('t.status = ?');
+      params.push(status);
     }
     
-    // Ordenar por data de criação (mais recente primeiro)
-    filteredTickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
+    }
     
-    res.json(filteredTickets);
+    query += ' ORDER BY t.created_at DESC';
+    
+    const [rows] = await pool.query(query, params);
+    
+    // Buscar comentários para cada ticket
+    for (let ticket of rows) {
+      const [comments] = await pool.query(
+        `SELECT c.*, u.nome as autor_nome 
+         FROM comments c 
+         JOIN users u ON c.autor_id = u.id 
+         WHERE c.ticket_id = ? 
+         ORDER BY c.created_at ASC`,
+        [ticket.id]
+      );
+      ticket.comments = comments;
+    }
+    
+    res.json(rows);
     
   } catch (error) {
     console.error('Get tickets error:', error);
@@ -398,7 +400,7 @@ app.get('/api/tickets', authenticateToken, (req, res) => {
 });
 
 // Criar ticket
-app.post('/api/tickets', authenticateToken, (req, res) => {
+app.post('/api/tickets', authenticateToken, async (req, res) => {
   try {
     const { categoria, prioridade, assunto, descricao } = req.body;
     const user = req.user;
@@ -407,37 +409,30 @@ app.post('/api/tickets', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
     }
     
-    const userRecord = getUserById(user.id);
-    if (!userRecord) {
+    // Buscar setor do usuário
+    const [userRows] = await pool.query('SELECT setor FROM users WHERE id = ?', [user.id]);
+    
+    if (userRows.length === 0) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
     
-    const newTicket = {
-      id: tickets.length + 1,
-      numero: generateTicketNumber(),
-      solicitante_id: user.id,
-      solicitante_nome: user.nome,
-      categoria,
-      prioridade,
-      assunto: assunto.trim(),
-      descricao: descricao.trim(),
-      status: 'aberto',
-      setor: userRecord.setor,
-      resposta: null,
-      assigned_id: null,
-      assigned_nome: null,
-      created_at: new Date(),
-      updated_at: new Date(),
-      comments: []
-    };
+    const numero = await generateTicketNumber();
     
-    tickets.push(newTicket);
-    ticketCounter++;
+    const [result] = await pool.query(
+      `INSERT INTO tickets (numero, solicitante_id, categoria, prioridade, assunto, descricao, setor)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [numero, user.id, categoria, prioridade, assunto.trim(), descricao.trim(), userRows[0].setor]
+    );
+    
+    const [ticketRows] = await pool.query('SELECT * FROM tickets WHERE id = ?', [result.insertId]);
+    const ticket = ticketRows[0];
+    ticket.solicitante_nome = user.nome;
+    ticket.comments = [];
     
     res.status(201).json({
       success: true,
       message: 'Ticket criado com sucesso',
-      ticket: newTicket
+      ticket
     });
     
   } catch (error) {
@@ -447,15 +442,28 @@ app.post('/api/tickets', authenticateToken, (req, res) => {
 });
 
 // Obter ticket específico
-app.get('/api/tickets/:id', authenticateToken, (req, res) => {
+app.get('/api/tickets/:id', authenticateToken, async (req, res) => {
   try {
     const ticketId = parseInt(req.params.id);
     const user = req.user;
     
-    const ticket = tickets.find(t => t.id === ticketId);
-    if (!ticket) {
+    const [rows] = await pool.query(
+      `SELECT 
+        t.*,
+        u1.nome as solicitante_nome,
+        u2.nome as assigned_nome
+       FROM tickets t
+       LEFT JOIN users u1 ON t.solicitante_id = u1.id
+       LEFT JOIN users u2 ON t.assigned_id = u2.id
+       WHERE t.id = ?`,
+      [ticketId]
+    );
+    
+    if (rows.length === 0) {
       return res.status(404).json({ error: 'Ticket não encontrado' });
     }
+    
+    const ticket = rows[0];
     
     // Verificar permissões
     if (user.role === 'colaborador' && ticket.solicitante_id !== user.id) {
@@ -463,11 +471,23 @@ app.get('/api/tickets/:id', authenticateToken, (req, res) => {
     }
     
     if (user.role === 'gestor') {
-      const userRecord = getUserById(user.id);
-      if (userRecord && ticket.setor !== userRecord.setor) {
+      const [userRows] = await pool.query('SELECT setor FROM users WHERE id = ?', [user.id]);
+      if (userRows.length > 0 && ticket.setor !== userRows[0].setor) {
         return res.status(403).json({ error: 'Sem permissão para ver este ticket' });
       }
     }
+    
+    // Buscar comentários
+    const [comments] = await pool.query(
+      `SELECT c.*, u.nome as autor_nome 
+       FROM comments c 
+       JOIN users u ON c.autor_id = u.id 
+       WHERE c.ticket_id = ? 
+       ORDER BY c.created_at ASC`,
+      [ticketId]
+    );
+    
+    ticket.comments = comments;
     
     res.json(ticket);
     
@@ -478,7 +498,7 @@ app.get('/api/tickets/:id', authenticateToken, (req, res) => {
 });
 
 // Atualizar status do ticket
-app.put('/api/tickets/:id/status', authenticateToken, (req, res) => {
+app.put('/api/tickets/:id/status', authenticateToken, async (req, res) => {
   try {
     const ticketId = parseInt(req.params.id);
     const { status } = req.body;
@@ -488,28 +508,38 @@ app.put('/api/tickets/:id/status', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Status inválido' });
     }
     
-    const ticketIndex = tickets.findIndex(t => t.id === ticketId);
-    if (ticketIndex === -1) {
-      return res.status(404).json({ error: 'Ticket não encontrado' });
-    }
-    
     // Apenas DP e gestores podem alterar status
     if (user.role === 'colaborador') {
       return res.status(403).json({ error: 'Sem permissão para alterar status' });
     }
     
-    tickets[ticketIndex].status = status;
-    tickets[ticketIndex].updated_at = new Date();
+    // Atribuir responsável se ainda não tiver
+    const [checkRows] = await pool.query('SELECT assigned_id FROM tickets WHERE id = ?', [ticketId]);
     
-    if (!tickets[ticketIndex].assigned_id && (user.role === 'dp' || user.role === 'gestor')) {
-      tickets[ticketIndex].assigned_id = user.id;
-      tickets[ticketIndex].assigned_nome = user.nome;
+    if (checkRows.length === 0) {
+      return res.status(404).json({ error: 'Ticket não encontrado' });
     }
+    
+    const shouldAssign = checkRows[0].assigned_id === null;
+    
+    if (shouldAssign) {
+      await pool.query(
+        'UPDATE tickets SET status = ?, assigned_id = ? WHERE id = ?',
+        [status, user.id, ticketId]
+      );
+    } else {
+      await pool.query(
+        'UPDATE tickets SET status = ? WHERE id = ?',
+        [status, ticketId]
+      );
+    }
+    
+    const [ticketRows] = await pool.query('SELECT * FROM tickets WHERE id = ?', [ticketId]);
     
     res.json({
       success: true,
       message: 'Status atualizado com sucesso',
-      ticket: tickets[ticketIndex]
+      ticket: ticketRows[0]
     });
     
   } catch (error) {
@@ -519,7 +549,7 @@ app.put('/api/tickets/:id/status', authenticateToken, (req, res) => {
 });
 
 // Adicionar comentário ao ticket
-app.post('/api/tickets/:id/comments', authenticateToken, (req, res) => {
+app.post('/api/tickets/:id/comments', authenticateToken, async (req, res) => {
   try {
     const ticketId = parseInt(req.params.id);
     const { comentario } = req.body;
@@ -529,26 +559,29 @@ app.post('/api/tickets/:id/comments', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Comentário é obrigatório' });
     }
     
-    const ticketIndex = tickets.findIndex(t => t.id === ticketId);
-    if (ticketIndex === -1) {
+    // Verificar se ticket existe
+    const [ticketCheck] = await pool.query('SELECT id FROM tickets WHERE id = ?', [ticketId]);
+    
+    if (ticketCheck.length === 0) {
       return res.status(404).json({ error: 'Ticket não encontrado' });
     }
     
-    const newComment = {
-      id: Date.now(),
-      autor_id: user.id,
-      autor_nome: user.nome,
-      comentario: comentario.trim(),
-      created_at: new Date()
-    };
+    const [result] = await pool.query(
+      'INSERT INTO comments (ticket_id, autor_id, comentario) VALUES (?, ?, ?)',
+      [ticketId, user.id, comentario.trim()]
+    );
     
-    tickets[ticketIndex].comments.push(newComment);
-    tickets[ticketIndex].updated_at = new Date();
+    const [commentRows] = await pool.query('SELECT * FROM comments WHERE id = ?', [result.insertId]);
+    const comment = commentRows[0];
+    comment.autor_nome = user.nome;
+    
+    // Atualizar updated_at do ticket
+    await pool.query('UPDATE tickets SET updated_at = CURRENT_TIMESTAMP WHERE id = ?', [ticketId]);
     
     res.status(201).json({
       success: true,
       message: 'Comentário adicionado com sucesso',
-      comment: newComment
+      comment
     });
     
   } catch (error) {
@@ -558,27 +591,41 @@ app.post('/api/tickets/:id/comments', authenticateToken, (req, res) => {
 });
 
 // Estatísticas do dashboard
-app.get('/api/dashboard/stats', authenticateToken, (req, res) => {
+app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
   try {
     const user = req.user;
     
-    let relevantTickets = tickets;
+    let whereClause = '';
+    const params = [];
     
-    // Filtrar tickets baseado no role
     if (user.role === 'colaborador') {
-      relevantTickets = tickets.filter(ticket => ticket.solicitante_id === user.id);
+      whereClause = 'WHERE solicitante_id = ?';
+      params.push(user.id);
     } else if (user.role === 'gestor') {
-      const userRecord = getUserById(user.id);
-      if (userRecord) {
-        relevantTickets = tickets.filter(ticket => ticket.setor === userRecord.setor);
+      const [userRows] = await pool.query('SELECT setor FROM users WHERE id = ?', [user.id]);
+      if (userRows.length > 0) {
+        whereClause = 'WHERE setor = ?';
+        params.push(userRows[0].setor);
       }
     }
     
+    const query = `
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'aberto' THEN 1 ELSE 0 END) as abertos,
+        SUM(CASE WHEN status = 'em-andamento' THEN 1 ELSE 0 END) as andamento,
+        SUM(CASE WHEN status = 'resolvido' THEN 1 ELSE 0 END) as resolvidos
+      FROM tickets
+      ${whereClause}
+    `;
+    
+    const [rows] = await pool.query(query, params);
+    
     const stats = {
-      total: relevantTickets.length,
-      abertos: relevantTickets.filter(t => t.status === 'aberto').length,
-      andamento: relevantTickets.filter(t => t.status === 'em-andamento').length,
-      resolvidos: relevantTickets.filter(t => t.status === 'resolvido').length
+      total: parseInt(rows[0].total),
+      abertos: parseInt(rows[0].abertos),
+      andamento: parseInt(rows[0].andamento),
+      resolvidos: parseInt(rows[0].resolvidos)
     };
     
     res.json(stats);
@@ -590,7 +637,7 @@ app.get('/api/dashboard/stats', authenticateToken, (req, res) => {
 });
 
 // Exportar tickets (apenas para DP e gestores)
-app.get('/api/tickets/export', authenticateToken, (req, res) => {
+app.get('/api/tickets/export', authenticateToken, async (req, res) => {
   try {
     const user = req.user;
     
@@ -598,26 +645,40 @@ app.get('/api/tickets/export', authenticateToken, (req, res) => {
       return res.status(403).json({ error: 'Sem permissão para exportar' });
     }
     
-    let relevantTickets = tickets;
+    let whereClause = '';
+    const params = [];
     
     if (user.role === 'gestor') {
-      const userRecord = getUserById(user.id);
-      if (userRecord) {
-        relevantTickets = tickets.filter(ticket => ticket.setor === userRecord.setor);
+      const [userRows] = await pool.query('SELECT setor FROM users WHERE id = ?', [user.id]);
+      if (userRows.length > 0) {
+        whereClause = 'WHERE t.setor = ?';
+        params.push(userRows[0].setor);
       }
     }
     
+    const [rows] = await pool.query(
+      `SELECT 
+        t.id, t.numero, u.nome as solicitante, t.categoria, 
+        t.prioridade, t.assunto, t.status, t.setor, t.created_at
+       FROM tickets t
+       JOIN users u ON t.solicitante_id = u.id
+       ${whereClause}
+       ORDER BY t.created_at DESC`,
+      params
+    );
+    
     // Gerar CSV
     const csvHeaders = 'ID,Número,Solicitante,Categoria,Prioridade,Assunto,Status,Setor,Data Criação\n';
-    const csvData = relevantTickets.map(ticket => {
-      return `${ticket.id},${ticket.numero},"${ticket.solicitante_nome}","${ticket.categoria}","${ticket.prioridade}","${ticket.assunto}","${ticket.status}","${ticket.setor}","${new Date(ticket.created_at).toLocaleDateString('pt-BR')}"`;
+    const csvData = rows.map(ticket => {
+      const date = new Date(ticket.created_at).toLocaleDateString('pt-BR');
+      return `${ticket.id},${ticket.numero},"${ticket.solicitante}","${ticket.categoria}","${ticket.prioridade}","${ticket.assunto}","${ticket.status}","${ticket.setor}","${date}"`;
     }).join('\n');
     
     const csv = csvHeaders + csvData;
     
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="tickets.csv"');
-    res.send('\ufeff' + csv); // BOM para UTF-8
+    res.send('\ufeff' + csv);
     
   } catch (error) {
     console.error('Export tickets error:', error);
@@ -631,9 +692,8 @@ app.get('/api/tickets/export', authenticateToken, (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
-    timestamp: new Date().toISOString(),
-    users: users.length,
-    tickets: tickets.length
+    database: 'MySQL', 
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -667,11 +727,18 @@ app.use('*', (req, res) => {
 // Start server - Railway must use 0.0.0.0
 const HOST = '0.0.0.0';
 
-app.listen(PORT, HOST, () => {
-  console.log(`🚀 Servidor rodando em http://${HOST}:${PORT}`);
-  console.log(`📊 Usuários cadastrados: ${users.length}`);
-  console.log(`🎫 Tickets no sistema: ${tickets.length}`);
-  console.log('📝 Credenciais de teste:');
-  console.log('   Admin DP: CPF 12345678901, Senha: 123456');
-  console.log('   Gestor: CPF 98765432101, Senha: 123456');
-});
+// Inicializar banco e servidor
+initializeDatabase()
+  .then(() => {
+    app.listen(PORT, HOST, () => {
+      console.log(`🚀 Servidor rodando em http://${HOST}:${PORT}`);
+      console.log(`💾 Banco de dados: MySQL (Railway)`);
+      console.log('📝 Credenciais de teste:');
+      console.log('   Admin DP: CPF 12345678901, Senha: 123456');
+      console.log('   Gestor: CPF 98765432101, Senha: 123456');
+    });
+  })
+  .catch((error) => {
+    console.error('❌ Erro fatal ao iniciar:', error);
+    process.exit(1);
+  });
