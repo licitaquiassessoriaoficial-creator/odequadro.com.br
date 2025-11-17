@@ -20,8 +20,9 @@ const AUTHORIZED_DP_CPFS = [
 const AUTHORIZED_GESTOR_CPFS = [
   '98765432101', // Gestor Teste
   '26346512870', // Robinson - Diretor ODQ (acesso total)
+  '43091484840', // Isabela Nascimento - Gestora TI
   // Adicione aqui os CPFs dos gestores:
-  // Adriano Bonfim, Clara Nave, Alexandre Marçal, Cristiane Silva
+  // Rafael (TI), Adriano Bonfim, Clara Nave, Alexandre Marçal, Cristiane Silva
 ];
 
 // Middleware para arquivos estáticos
