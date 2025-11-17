@@ -26,8 +26,9 @@ const AUTHORIZED_GESTOR_CPFS = [
   '16514242847', // Clara Nave - Gestora
   '28058450804', // Adriano Bonfim - Gestor
   '07374845782', // Alexandre Marçal - Gestor
+  '29826777846', // Cristiane Alves da Silva - Gestora
   // Adicione aqui os CPFs dos gestores:
-  // Rafael (TI), Cristiane Silva
+  // Rafael (TI)
 ];
 
 // Middleware para arquivos estáticos
@@ -899,15 +900,6 @@ app.post('/api/contato', (req, res) => {
   });
 });
 
-// Middleware de tratamento de erro
-app.use((err, req, res, next) => {
-  console.error('Erro no servidor:', err.stack);
-  res.status(500).json({ 
-    error: 'Erro interno do servidor',
-    message: err.message
-  });
-});
-
 // Rota para receber currículos (Trabalhe Conosco)
 app.post('/api/curriculos', express.json(), async (req, res) => {
   try {
@@ -982,6 +974,15 @@ app.get('/api/curriculos', authenticateToken, async (req, res) => {
 // 404 - Redireciona para home
 app.use('*', (req, res) => {
   res.redirect('/');
+});
+
+// Middleware de tratamento de erro (deve ser o último)
+app.use((err, req, res, next) => {
+  console.error('Erro no servidor:', err.stack);
+  res.status(500).json({ 
+    error: 'Erro interno do servidor',
+    message: err.message
+  });
 });
 
 // Start server - Railway must use 0.0.0.0
