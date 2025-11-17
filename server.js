@@ -13,6 +13,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'odequadro_secret_key_2025';
 const AUTHORIZED_DP_CPFS = [
   '12345678901', // Admin Sistema (teste)
   '26346512870', // Robinson - Diretor ODQ (acesso total)
+  '55796696823', // Kevely - Departamento Pessoal
+  '29539610893', // Kátia - Departamento Pessoal
   // Adicione aqui os CPFs autorizados para acessar o DP
 ];
 
