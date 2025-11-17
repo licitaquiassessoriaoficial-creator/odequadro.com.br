@@ -429,6 +429,45 @@ app.post('/api/change-first-password', authenticateToken, async (req, res) => {
   }
 });
 
+// Buscar gestores por contrato
+app.get('/api/gestores-por-contrato', authenticateToken, async (req, res) => {
+  try {
+    const { contrato } = req.query;
+    
+    if (!contrato) {
+      return res.status(400).json({ error: 'Contrato é obrigatório' });
+    }
+    
+    // Buscar gestores que gerenciam este contrato
+    const [gestores] = await pool.query(`
+      SELECT id, nome, setor, contratos
+      FROM users
+      WHERE role = 'gestor' 
+      AND FIND_IN_SET(?, REPLACE(contratos, ' ', '')) > 0
+      ORDER BY nome
+    `, [contrato.trim()]);
+    
+    // Também buscar usuários DP (têm acesso a todos os contratos)
+    const [dpUsers] = await pool.query(`
+      SELECT id, nome, setor, contratos
+      FROM users
+      WHERE role = 'dp'
+      ORDER BY nome
+    `);
+    
+    const todosGestores = [...gestores, ...dpUsers];
+    
+    res.json({
+      success: true,
+      gestores: todosGestores
+    });
+    
+  } catch (error) {
+    console.error('Get gestores error:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
 // Listar tickets
 app.get('/api/tickets', authenticateToken, async (req, res) => {
   try {
@@ -505,7 +544,7 @@ app.get('/api/tickets', authenticateToken, async (req, res) => {
 // Criar ticket
 app.post('/api/tickets', authenticateToken, async (req, res) => {
   try {
-    const { contrato, setor, categoria, prioridade, assunto, descricao } = req.body;
+    const { contrato, setor, categoria, prioridade, assunto, descricao, gestor_id } = req.body;
     const user = req.user;
     
     if (!contrato || !setor || !categoria || !prioridade || !assunto || !descricao) {
@@ -515,9 +554,9 @@ app.post('/api/tickets', authenticateToken, async (req, res) => {
     const numero = await generateTicketNumber();
     
     const [result] = await pool.query(
-      `INSERT INTO tickets (numero, solicitante_id, categoria, prioridade, assunto, descricao, setor, contrato)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [numero, user.id, categoria, prioridade, assunto.trim(), descricao.trim(), setor, contrato]
+      `INSERT INTO tickets (numero, solicitante_id, categoria, prioridade, assunto, descricao, setor, contrato, assigned_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [numero, user.id, categoria, prioridade, assunto.trim(), descricao.trim(), setor, contrato, gestor_id || null]
     );
     
     const [ticketRows] = await pool.query('SELECT * FROM tickets WHERE id = ?', [result.insertId]);

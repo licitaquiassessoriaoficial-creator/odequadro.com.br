@@ -7847,6 +7847,13 @@ html {
   display: none !important;
 }
 
+.helper-text {
+  color: #666;
+  font-size: 0.85em;
+  margin-top: 4px;
+  display: block;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

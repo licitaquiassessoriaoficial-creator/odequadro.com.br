@@ -142,7 +142,7 @@
                   </select>
                 </div>
                 
-                <div class="form-group" id="contratosGroup" style="display: none;">
+                <div class="form-group form-hidden" id="contratosGroup">
                   <label for="primeiroContratos">Contrato(s) que Gerencia</label>
                   <select id="primeiroContratos" name="contratos" multiple size="8">
                     <option value="ADM CAMP">ADM CAMP</option>
@@ -166,7 +166,7 @@
                     <option value="ENGENHARIA SS">ENGENHARIA SS</option>
                     <option value="TRANSPETRO LOGISTICA">TRANSPETRO LOGISTICA</option>
                   </select>
-                  <small style="color: #666; font-size: 0.85em; margin-top: 4px; display: block;">
+                  <small class="helper-text">
                     Segure Ctrl (Windows) ou Cmd (Mac) para selecionar múltiplos contratos
                   </small>
                 </div>
@@ -472,6 +472,16 @@
                 <option value="ENGENHARIA SS">ENGENHARIA SS</option>
                 <option value="TRANSPETRO LOGISTICA">TRANSPETRO LOGISTICA</option>
               </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="gestor">Gestor Responsável</label>
+              <select id="gestor" name="gestor_id">
+                <option value="">Carregando gestores...</option>
+              </select>
+              <small class="helper-text">
+                Serão exibidos apenas gestores do contrato selecionado
+              </small>
             </div>
             
             <div class="form-group">
@@ -1446,7 +1456,8 @@
           categoria: formData.get('categoria'),
           prioridade: formData.get('prioridade'),
           assunto: formData.get('assunto'),
-          descricao: formData.get('descricao')
+          descricao: formData.get('descricao'),
+          gestor_id: formData.get('gestor_id') || null
         };
 
         try {
@@ -1471,6 +1482,46 @@
         } catch (error) {
           console.error('Create ticket error:', error);
           alert('Erro de conexão');
+        }
+      });
+
+      // Carregar gestores baseado no contrato selecionado
+      const contratoSelect = document.getElementById('contrato');
+      const gestorSelect = document.getElementById('gestor');
+      
+      contratoSelect.addEventListener('change', async function() {
+        const contrato = this.value;
+        
+        if (!contrato) {
+          gestorSelect.innerHTML = '<option value="">Primeiro selecione um contrato</option>';
+          return;
+        }
+        
+        try {
+          gestorSelect.innerHTML = '<option value="">Carregando...</option>';
+          
+          const response = await fetch(`${API_BASE}/gestores-por-contrato?contrato=${encodeURIComponent(contrato)}`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok && data.gestores && data.gestores.length > 0) {
+            gestorSelect.innerHTML = '<option value="">Selecione um gestor (opcional)</option>';
+            data.gestores.forEach(gestor => {
+              const option = document.createElement('option');
+              option.value = gestor.id;
+              option.textContent = `${gestor.nome} - ${gestor.setor}`;
+              gestorSelect.appendChild(option);
+            });
+          } else {
+            gestorSelect.innerHTML = '<option value="">Nenhum gestor disponível para este contrato</option>';
+          }
+        } catch (error) {
+          console.error('Erro ao carregar gestores:', error);
+          gestorSelect.innerHTML = '<option value="">Erro ao carregar gestores</option>';
         }
       });
 
