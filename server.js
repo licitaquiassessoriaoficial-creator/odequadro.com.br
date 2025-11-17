@@ -24,8 +24,9 @@ const AUTHORIZED_GESTOR_CPFS = [
   '26346512870', // Robinson - Diretor ODQ (acesso total)
   '43091484840', // Isabela Nascimento - Gestora TI
   '16514242847', // Clara Nave - Gestora
+  '28058450804', // Adriano Bonfim - Gestor
   // Adicione aqui os CPFs dos gestores:
-  // Rafael (TI), Adriano Bonfim, Alexandre Marçal, Cristiane Silva
+  // Rafael (TI), Alexandre Marçal, Cristiane Silva
 ];
 
 // Middleware para arquivos estáticos
