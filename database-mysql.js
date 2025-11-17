@@ -1,20 +1,29 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 
-// Configuração do MySQL - Railway fornece MYSQL_URL
+// Configuração do MySQL - Railway fornece MYSQL_URL ou DATABASE_URL
 const databaseUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
 
-const pool = mysql.createPool(databaseUrl ? databaseUrl : {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'odequadro',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0
-});
+let poolConfig;
+
+if (databaseUrl) {
+  // Railway fornece URL no formato: mysql://user:password@host:port/database
+  // mysql2 aceita a URL diretamente como string
+  poolConfig = databaseUrl;
+} else {
+  // Desenvolvimento local
+  poolConfig = {
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'odequadro',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  };
+}
+
+const pool = mysql.createPool(poolConfig);
 
 // Inicializar banco de dados
 async function initializeDatabase() {

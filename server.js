@@ -15,6 +15,12 @@ const AUTHORIZED_DP_CPFS = [
   // Adicione aqui os CPFs autorizados para acessar o DP
 ];
 
+// CPFs autorizados para Gestores
+const AUTHORIZED_GESTOR_CPFS = [
+  '98765432101', // Gestor Teste
+  // Adicione aqui os CPFs autorizados para acessar como Gestor
+];
+
 // Middleware para arquivos estáticos
 app.use(express.static('.'));
 
@@ -189,10 +195,17 @@ app.post('/api/login', async (req, res) => {
     
     const cleanCPF = cpf.replace(/\D/g, '');
     
-    // Validar se CPF está autorizado para DP (apenas no login)
+    // Validar se CPF está autorizado para DP
     if (role === 'dp' && !AUTHORIZED_DP_CPFS.includes(cleanCPF)) {
       return res.status(403).json({ 
         error: 'Acesso negado. CPF não autorizado para o Departamento Pessoal.' 
+      });
+    }
+    
+    // Validar se CPF está autorizado para Gestor
+    if (role === 'gestor' && !AUTHORIZED_GESTOR_CPFS.includes(cleanCPF)) {
+      return res.status(403).json({ 
+        error: 'Acesso negado. CPF não autorizado para acesso como Gestor.' 
       });
     }
     
@@ -259,6 +272,13 @@ app.post('/api/register', async (req, res) => {
     if (role === 'dp' && !AUTHORIZED_DP_CPFS.includes(cleanCPF)) {
       return res.status(403).json({ 
         error: 'CPF não autorizado para acesso ao Departamento Pessoal. Entre em contato com a administração.' 
+      });
+    }
+    
+    // Validar se CPF está autorizado para Gestor
+    if (role === 'gestor' && !AUTHORIZED_GESTOR_CPFS.includes(cleanCPF)) {
+      return res.status(403).json({ 
+        error: 'CPF não autorizado para acesso como Gestor. Entre em contato com a administração.' 
       });
     }
     
