@@ -2,8 +2,13 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 
 // Configuração do MySQL - Railway fornece MYSQL_URL
-const pool = mysql.createPool({
-  uri: process.env.MYSQL_URL || process.env.DATABASE_URL,
+const databaseUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
+
+const pool = mysql.createPool(databaseUrl ? databaseUrl : {
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'odequadro',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
