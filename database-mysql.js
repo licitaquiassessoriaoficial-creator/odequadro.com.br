@@ -139,6 +139,28 @@ async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     
+    // Criar tabela de currículos
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS curriculos (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nome VARCHAR(100) NOT NULL,
+        email VARCHAR(100) NOT NULL,
+        telefone VARCHAR(20) NOT NULL,
+        cargo VARCHAR(100) NOT NULL,
+        linkedin VARCHAR(255),
+        curriculo_path VARCHAR(255) NOT NULL,
+        curriculo_nome VARCHAR(255) NOT NULL,
+        mensagem TEXT,
+        status ENUM('novo', 'em-analise', 'aprovado', 'reprovado') DEFAULT 'novo',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_email (email),
+        INDEX idx_cargo (cargo),
+        INDEX idx_status (status),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    
     console.log('✅ Tabelas criadas/verificadas');
     
     // Verificar se já existem usuários

@@ -25,8 +25,9 @@ const AUTHORIZED_GESTOR_CPFS = [
   '43091484840', // Isabela Nascimento - Gestora TI
   '16514242847', // Clara Nave - Gestora
   '28058450804', // Adriano Bonfim - Gestor
+  '07374845782', // Alexandre Marçal - Gestor
   // Adicione aqui os CPFs dos gestores:
-  // Rafael (TI), Alexandre Marçal, Cristiane Silva
+  // Rafael (TI), Cristiane Silva
 ];
 
 // Middleware para arquivos estáticos
@@ -905,6 +906,80 @@ app.use((err, req, res, next) => {
     error: 'Erro interno do servidor',
     message: err.message
   });
+});
+
+  }
+});
+
+// Rota para receber currículos (Trabalhe Conosco)
+app.post('/api/curriculos', express.json(), async (req, res) => {
+  try {
+    const { nome, email, telefone, cargo, linkedin, mensagem, curriculo_base64, curriculo_nome } = req.body;
+    
+    if (!nome || !email || !telefone || !cargo || !curriculo_base64 || !curriculo_nome) {
+      return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos' });
+    }
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Email inválido' });
+    }
+    
+    // Salvar currículo no formato base64 (simplificado para MVP)
+    const curriculo_path = `curriculos/${Date.now()}_${curriculo_nome}`;
+    
+    const [result] = await pool.query(
+      `INSERT INTO curriculos (nome, email, telefone, cargo, linkedin, curriculo_path, curriculo_nome, mensagem, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'novo')`,
+      [nome.trim(), email.trim(), telefone.trim(), cargo, linkedin || null, curriculo_path, curriculo_nome, mensagem || null]
+    );
+    
+    res.status(201).json({
+      success: true,
+      message: 'Currículo enviado com sucesso! Entraremos em contato em breve.',
+      id: result.insertId
+    });
+    
+  } catch (error) {
+    console.error('Curriculo submission error:', error);
+    res.status(500).json({ error: 'Erro ao enviar currículo. Tente novamente.' });
+  }
+});
+
+// Listar currículos (apenas para DP/Gestores autenticados)
+app.get('/api/curriculos', authenticateToken, async (req, res) => {
+  try {
+    const user = req.user;
+    
+    // Apenas DP e gestores podem ver currículos
+    if (user.role !== 'dp' && user.role !== 'gestor') {
+      return res.status(403).json({ error: 'Sem permissão para acessar currículos' });
+    }
+    
+    const { status } = req.query;
+    
+    let query = 'SELECT id, nome, email, telefone, cargo, linkedin, curriculo_nome, status, created_at FROM curriculos';
+    const params = [];
+    
+    if (status) {
+      query += ' WHERE status = ?';
+      params.push(status);
+    }
+    
+    query += ' ORDER BY created_at DESC';
+    
+    const [rows] = await pool.query(query, params);
+    
+    res.json({
+      success: true,
+      curriculos: rows
+    });
+    
+  } catch (error) {
+    console.error('Get curriculos error:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
 });
 
 // 404 - Redireciona para home

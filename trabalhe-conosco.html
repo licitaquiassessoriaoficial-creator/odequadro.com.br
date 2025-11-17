@@ -323,23 +323,62 @@
         });
         
         // Form submission
+        const API_BASE = 'https://web-production-b4f40.up.railway.app/api';
+        
         document.getElementById('candidaturaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
+            const fileInput = document.getElementById('curriculo');
             
-            try {
-                // Aqui você pode integrar com um backend ou serviço de email
-                // Por enquanto, vamos simular o envio
-                
-                alert('Candidatura enviada com sucesso! Entraremos em contato em breve.');
-                this.reset();
-                fileName.textContent = '';
-                
-            } catch (error) {
-                console.error('Erro ao enviar candidatura:', error);
-                alert('Erro ao enviar candidatura. Por favor, tente novamente ou entre em contato conosco diretamente.');
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Por favor, anexe seu currículo');
+                return;
             }
+            
+            const file = fileInput.files[0];
+            
+            // Converter arquivo para base64
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64 = e.target.result.split(',')[1];
+                
+                const curriculoData = {
+                    nome: formData.get('nome'),
+                    email: formData.get('email'),
+                    telefone: formData.get('telefone'),
+                    cargo: formData.get('cargo'),
+                    linkedin: formData.get('linkedin'),
+                    mensagem: formData.get('mensagem'),
+                    curriculo_base64: base64,
+                    curriculo_nome: file.name
+                };
+                
+                try {
+                    const response = await fetch(`${API_BASE}/curriculos`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(curriculoData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        alert(data.message || 'Candidatura enviada com sucesso! Entraremos em contato em breve.');
+                        document.getElementById('candidaturaForm').reset();
+                        fileName.textContent = '';
+                    } else {
+                        alert(data.error || 'Erro ao enviar candidatura');
+                    }
+                } catch (error) {
+                    console.error('Erro ao enviar candidatura:', error);
+                    alert('Erro ao enviar candidatura. Por favor, tente novamente ou entre em contato conosco diretamente.');
+                }
+            };
+            
+            reader.readAsDataURL(file);
         });
         
         // Scroll to candidatura form
