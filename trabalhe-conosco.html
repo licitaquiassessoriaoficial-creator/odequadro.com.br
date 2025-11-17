@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trabalhe Conosco - O de Quadro - Envie seu currículo e faça parte da nossa equipe">
+    <title>Trabalhe Conosco - O de Quadro</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="Logo Grupo O. de Quadro.png" alt="O de Quadro">
+                    </a>
+                </div>
+                
+                <button class="mobile-menu-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="quem-somos.html">Quem Somos</a></li>
+                        <li><a href="servicos.html">Serviços</a></li>
+                        <li><a href="segmentos.html">Segmentos</a></li>
+                        <li><a href="certificacoes.html">Certificações</a></li>
+                        <li><a href="trabalhe-conosco.html" class="active">Trabalhe Conosco</a></li>
+                        <li><a href="contato.html">Contato</a></li>
+                        <li><a href="tickets.html" class="btn-ticket">Sistema de Tickets</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-internal">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="animate-fade-in">Trabalhe Conosco</h1>
+                <p class="hero-subtitle animate-fade-in">Faça parte da nossa equipe e construa uma carreira de sucesso</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trabalhe Conosco Content -->
+    <section class="trabalhe-conosco-section">
+        <div class="container">
+            <!-- Introdução -->
+            <div class="intro-content">
+                <h2>Por que trabalhar na O de Quadro?</h2>
+                <p>Somos uma empresa em constante crescimento, comprometida com a excelência e o desenvolvimento profissional de nossos colaboradores. Oferecemos um ambiente de trabalho dinâmico, com oportunidades reais de crescimento e aprendizado.</p>
+            </div>
+
+            <!-- Benefícios -->
+            <div class="beneficios-section">
+                <h2>Nossos Benefícios</h2>
+                <div class="beneficios-grid">
+                    <div class="beneficio-card">
+                        <div class="beneficio-icon">
+                            <i class="fas fa-briefcase-medical"></i>
+                        </div>
+                        <h3>Plano de Saúde</h3>
+                        <p>Assistência médica completa para você e sua família</p>
+                    </div>
+                    
+                    <div class="beneficio-card">
+                        <div class="beneficio-icon">
+                            <i class="fas fa-tooth"></i>
+                        </div>
+                        <h3>Plano Odontológico</h3>
+                        <p>Cuidado completo com sua saúde bucal</p>
+                    </div>
+                    
+                    <div class="beneficio-card">
+                        <div class="beneficio-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <h3>Vale Alimentação</h3>
+                        <p>Benefício para suas compras de supermercado</p>
+                    </div>
+                    
+                    <div class="beneficio-card">
+                        <div class="beneficio-icon">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                        <h3>Vale Transporte</h3>
+                        <p>Deslocamento facilitado para o trabalho</p>
+                    </div>
+                    
+                    <div class="beneficio-card">
+                        <div class="beneficio-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Capacitação</h3>
+                        <p>Treinamentos e cursos para seu desenvolvimento</p>
+                    </div>
+                    
+                    <div class="beneficio-card">
+                        <div class="beneficio-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Plano de Carreira</h3>
+                        <p>Oportunidades reais de crescimento profissional</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Candidatura -->
+            <div class="candidatura-section">
+                <h2>Envie seu Currículo</h2>
+                <p class="section-subtitle">Preencha o formulário abaixo e faça parte da nossa equipe</p>
+                
+                <form class="candidatura-form" id="candidaturaForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nome">Nome Completo *</label>
+                            <input type="text" id="nome" name="nome" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">E-mail *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="telefone">Telefone/WhatsApp *</label>
+                            <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cargo">Cargo Desejado *</label>
+                            <select id="cargo" name="cargo" required>
+                                <option value="">Selecione uma opção</option>
+                                <option value="Administrativo">Administrativo</option>
+                                <option value="Facilities">Facilities</option>
+                                <option value="Recursos Humanos">Recursos Humanos</option>
+                                <option value="Financeiro">Financeiro</option>
+                                <option value="TI">Tecnologia da Informação</option>
+                                <option value="Operacional">Operacional</option>
+                                <option value="Gerencial">Gerencial</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="linkedin">LinkedIn (opcional)</label>
+                        <input type="url" id="linkedin" name="linkedin" placeholder="https://www.linkedin.com/in/seu-perfil">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="curriculo">Currículo (PDF) *</label>
+                        <div class="file-upload">
+                            <input type="file" id="curriculo" name="curriculo" accept=".pdf" required>
+                            <label for="curriculo" class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Clique para selecionar o arquivo</span>
+                            </label>
+                            <span class="file-name"></span>
+                        </div>
+                        <small>Formato aceito: PDF (máx. 5MB)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mensagem">Mensagem (opcional)</label>
+                        <textarea id="mensagem" name="mensagem" rows="5" placeholder="Conte-nos um pouco sobre você e suas expectativas..."></textarea>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="aceite" name="aceite" required>
+                            <span>Aceito que meus dados sejam utilizados para fins de recrutamento e seleção *</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Candidatura
+                    </button>
+                </form>
+            </div>
+
+            <!-- Vagas em Aberto -->
+            <div class="vagas-section">
+                <h2>Vagas em Aberto</h2>
+                <p class="section-subtitle">Confira nossas oportunidades disponíveis</p>
+                
+                <div class="vagas-list" id="vagasList">
+                    <div class="vaga-card">
+                        <div class="vaga-header">
+                            <h3>Analista de Recursos Humanos</h3>
+                            <span class="vaga-badge">Presencial</span>
+                        </div>
+                        <div class="vaga-info">
+                            <p><i class="fas fa-map-marker-alt"></i> Campinas - SP</p>
+                            <p><i class="fas fa-briefcase"></i> Tempo Integral</p>
+                            <p><i class="fas fa-calendar"></i> CLT</p>
+                        </div>
+                        <p class="vaga-descricao">Buscamos profissional para atuar com rotinas de departamento pessoal, recrutamento e seleção.</p>
+                        <button class="btn secondary" onclick="scrollToCandidatura()">Candidatar-se</button>
+                    </div>
+                    
+                    <div class="vaga-card">
+                        <div class="vaga-header">
+                            <h3>Supervisor de Facilities</h3>
+                            <span class="vaga-badge">Presencial</span>
+                        </div>
+                        <div class="vaga-info">
+                            <p><i class="fas fa-map-marker-alt"></i> São Paulo - SP</p>
+                            <p><i class="fas fa-briefcase"></i> Tempo Integral</p>
+                            <p><i class="fas fa-calendar"></i> CLT</p>
+                        </div>
+                        <p class="vaga-descricao">Supervisão de equipes de facilities em grandes contratos. Experiência em gestão de pessoas.</p>
+                        <button class="btn secondary" onclick="scrollToCandidatura()">Candidatar-se</button>
+                    </div>
+                    
+                    <div class="vaga-card">
+                        <div class="vaga-header">
+                            <h3>Auxiliar Administrativo</h3>
+                            <span class="vaga-badge">Presencial</span>
+                        </div>
+                        <div class="vaga-info">
+                            <p><i class="fas fa-map-marker-alt"></i> Campinas - SP</p>
+                            <p><i class="fas fa-briefcase"></i> Tempo Integral</p>
+                            <p><i class="fas fa-calendar"></i> CLT</p>
+                        </div>
+                        <p class="vaga-descricao">Apoio em rotinas administrativas, organização de documentos e atendimento.</p>
+                        <button class="btn secondary" onclick="scrollToCandidatura()">Candidatar-se</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-contact">
+                    <div class="contact-item">
+                        <i class="icon-email-green"></i>
+                        <span>contato@odequadroservicos.com.br</span>
+                    </div>
+                    <div class="footer-logo">
+                        <img src="Logo Grupo O. de Quadro.png" alt="O de Quadro" />
+                    </div>
+                    <div class="contact-item">
+                        <i class="icon-phone-green"></i>
+                        <span>+55 19 3278-2401</span>
+                        <div class="whatsapp-icon">
+                            <i class="icon-whatsapp"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-content">
+                    <p>&copy; 2025 O de Quadro Serviços. Todos os direitos reservados.</p>
+                    <p>Desenvolvido por Bela Nascimento</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script>
+        // File upload handler
+        const fileInput = document.getElementById('curriculo');
+        const fileName = document.querySelector('.file-name');
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                fileName.textContent = file.name;
+                
+                // Validar tamanho do arquivo (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('O arquivo não pode ser maior que 5MB');
+                    this.value = '';
+                    fileName.textContent = '';
+                }
+            }
+        });
+        
+        // Form submission
+        document.getElementById('candidaturaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            try {
+                // Aqui você pode integrar com um backend ou serviço de email
+                // Por enquanto, vamos simular o envio
+                
+                alert('Candidatura enviada com sucesso! Entraremos em contato em breve.');
+                this.reset();
+                fileName.textContent = '';
+                
+            } catch (error) {
+                console.error('Erro ao enviar candidatura:', error);
+                alert('Erro ao enviar candidatura. Por favor, tente novamente ou entre em contato conosco diretamente.');
+            }
+        });
+        
+        // Scroll to candidatura form
+        function scrollToCandidatura() {
+            const candidaturaSection = document.querySelector('.candidatura-section');
+            candidaturaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+</html>

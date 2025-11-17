@@ -7881,3 +7881,360 @@ html {
     margin-right: 4px;
   }
 }
+
+/* ========================================
+   TRABALHE CONOSCO PAGE
+   ======================================== */
+
+.trabalhe-conosco-section {
+  padding: 80px 0;
+  background-color: var(--color-gray-100);
+}
+
+.intro-content {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 60px;
+}
+
+.intro-content h2 {
+  font-size: 2.5rem;
+  color: var(--color-dark);
+  margin-bottom: 20px;
+}
+
+.intro-content p {
+  font-size: 1.1rem;
+  color: var(--color-gray-700);
+  line-height: 1.8;
+}
+
+/* Benefícios */
+.beneficios-section {
+  margin-bottom: 80px;
+}
+
+.beneficios-section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--color-dark);
+  margin-bottom: 50px;
+}
+
+.beneficios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.beneficio-card {
+  background: var(--color-white);
+  padding: 40px 30px;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.beneficio-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(46, 184, 92, 0.15);
+}
+
+.beneficio-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.beneficio-icon i {
+  font-size: 2rem;
+  color: var(--color-white);
+}
+
+.beneficio-card h3 {
+  font-size: 1.3rem;
+  color: var(--color-dark);
+  margin-bottom: 10px;
+}
+
+.beneficio-card p {
+  color: var(--color-gray-600);
+  line-height: 1.6;
+}
+
+/* Candidatura */
+.candidatura-section {
+  background: var(--color-white);
+  padding: 60px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-bottom: 80px;
+}
+
+.candidatura-section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--color-dark);
+  margin-bottom: 10px;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--color-gray-600);
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+.candidatura-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--color-gray-300);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(46, 184, 92, 0.1);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 5px;
+  color: var(--color-gray-600);
+  font-size: 0.85rem;
+}
+
+.file-upload {
+  position: relative;
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  border: 2px dashed var(--color-gray-400);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--color-gray-100);
+}
+
+.file-upload-label:hover {
+  border-color: var(--color-primary);
+  background: rgba(46, 184, 92, 0.05);
+}
+
+.file-upload-label i {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+.file-upload-label span {
+  color: var(--color-gray-700);
+  font-weight: 500;
+}
+
+.file-name {
+  display: block;
+  margin-top: 10px;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.checkbox-group {
+  margin-top: 30px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  margin-top: 3px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.checkbox-label span {
+  color: var(--color-gray-700);
+  line-height: 1.6;
+}
+
+.candidatura-form .btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 16px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Vagas */
+.vagas-section {
+  margin-bottom: 40px;
+}
+
+.vagas-section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--color-dark);
+  margin-bottom: 10px;
+}
+
+.vagas-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.vaga-card {
+  background: var(--color-white);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.vaga-card:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+}
+
+.vaga-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.vaga-header h3 {
+  font-size: 1.4rem;
+  color: var(--color-dark);
+  margin: 0;
+  flex: 1;
+}
+
+.vaga-badge {
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vaga-info {
+  margin-bottom: 15px;
+}
+
+.vaga-info p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-gray-600);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.vaga-info i {
+  color: var(--color-primary);
+  width: 16px;
+}
+
+.vaga-descricao {
+  color: var(--color-gray-700);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.vaga-card .btn {
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .trabalhe-conosco-section {
+    padding: 40px 0;
+  }
+  
+  .intro-content h2,
+  .beneficios-section h2,
+  .candidatura-section h2,
+  .vagas-section h2 {
+    font-size: 1.8rem;
+  }
+  
+  .beneficios-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .candidatura-section {
+    padding: 30px 20px;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .vagas-list {
+    grid-template-columns: 1fr;
+  }
+}
