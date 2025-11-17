@@ -12,13 +12,16 @@ const JWT_SECRET = process.env.JWT_SECRET || 'odequadro_secret_key_2025';
 // CPFs autorizados para Departamento Pessoal (DP)
 const AUTHORIZED_DP_CPFS = [
   '12345678901', // Admin Sistema (teste)
+  '26346512870', // Robinson - Diretor ODQ (acesso total)
   // Adicione aqui os CPFs autorizados para acessar o DP
 ];
 
 // CPFs autorizados para Gestores
 const AUTHORIZED_GESTOR_CPFS = [
   '98765432101', // Gestor Teste
-  // Adicione aqui os CPFs autorizados para acessar como Gestor
+  '26346512870', // Robinson - Diretor ODQ (acesso total)
+  // Adicione aqui os CPFs dos gestores:
+  // Adriano Bonfim, Clara Nave, Alexandre Marçal, Cristiane Silva
 ];
 
 // Middleware para arquivos estáticos
