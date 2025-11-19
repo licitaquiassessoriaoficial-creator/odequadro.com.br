@@ -1,3 +1,5 @@
+// Defina a URL do backend Railway aqui
+const API_BASE = "https://web-production-b4f40.up.railway.app";
 // Mobile navigation toggle
 document.addEventListener('DOMContentLoaded', function() {
 

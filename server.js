@@ -1,3 +1,5 @@
+// ...existing code...
+
 // Buscar todos os gestores reais (sem filtro de contrato)
 app.get('/api/gestores-todos', async (req, res) => {
   try {
