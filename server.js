@@ -1,20 +1,10 @@
 // ...existing code...
 
+// ...existing code...
+
 // Buscar todos os gestores reais (sem filtro de contrato)
-app.get('/api/gestores-todos', async (req, res) => {
-  try {
-    const [gestores] = await pool.query(`
-      SELECT id, nome
-      FROM users
-      WHERE role = 'gestor'
-      ORDER BY nome
-    `);
-    res.json({ gestores });
-  } catch (error) {
-    console.error('Erro ao buscar gestores:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-});
+// Esta rota deve ficar após a inicialização do app
+// Adicionando aqui para garantir a ordem correta
 const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -54,6 +44,22 @@ app.use(express.static('.'));
 // Middleware para parsing de JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Buscar todos os gestores reais (sem filtro de contrato)
+app.get('/api/gestores-todos', async (req, res) => {
+  try {
+    const [gestores] = await pool.query(`
+      SELECT id, nome
+      FROM users
+      WHERE role = 'gestor'
+      ORDER BY nome
+    `);
+    res.json({ gestores });
+  } catch (error) {
+    console.error('Erro ao buscar gestores:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
 
 // Log all requests
 app.use((req, res, next) => {
