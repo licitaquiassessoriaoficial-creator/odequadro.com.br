@@ -1,5 +1,53 @@
 // Mobile navigation toggle
 document.addEventListener('DOMContentLoaded', function() {
+
+    // Carregar todos os gestores ao abrir a página
+    const gestorSelect = document.getElementById('gestor');
+    if (gestorSelect) {
+      try {
+        fetch(`${API_BASE}/gestores-todos`)
+          .then(response => response.json())
+          .then(data => {
+            gestorSelect.innerHTML = '<option value="">Selecione o gestor</option>';
+            if (data.gestores && Array.isArray(data.gestores)) {
+              data.gestores.forEach(gestor => {
+                const option = document.createElement('option');
+                option.value = gestor.id;
+                option.textContent = gestor.nome;
+                gestorSelect.appendChild(option);
+              });
+            }
+          })
+          .catch(() => {
+            gestorSelect.innerHTML = '<option value="">Erro ao carregar gestores</option>';
+          });
+      } catch (error) {
+        gestorSelect.innerHTML = '<option value="">Erro ao carregar gestores</option>';
+      }
+    }
+
+    // Envio de ticket com imagem
+    const newTicketForm = document.getElementById('newTicketForm');
+    if (newTicketForm) {
+      newTicketForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(newTicketForm);
+        try {
+          const response = await fetch(`${API_BASE}/tickets`, {
+            method: 'POST',
+            body: formData
+          });
+          if (response.ok) {
+            alert('Ticket enviado com sucesso!');
+            newTicketForm.reset();
+          } else {
+            alert('Erro ao enviar ticket.');
+          }
+        } catch (error) {
+          alert('Erro ao enviar ticket.');
+        }
+      });
+    }
   // Hero video management
   const heroVideo = document.querySelector('.hero-video');
   if (heroVideo) {

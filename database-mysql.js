@@ -173,10 +173,22 @@ async function initializeDatabase() {
       const isabelaPassword = await bcrypt.hash('230919', 10);
       
       await connection.query(`
-        INSERT INTO users (cpf, nome, email, senha, role, setor, first_login) VALUES
-        (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO users (cpf, nome, email, senha, role, setor, contratos, first_login) VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?),
+        (?, ?, ?, ?, ?, ?, ?, ?),
+        (?, ?, ?, ?, ?, ?, ?, ?),
+        (?, ?, ?, ?, ?, ?, ?, ?),
+        (?, ?, ?, ?, ?, ?, ?, ?),
+        (?, ?, ?, ?, ?, ?, ?, ?),
+        (?, ?, ?, ?, ?, ?, ?, ?)
       `, [
-        '43091484840', 'Isabela Nascimento', 'isabela.nascimento@odequadro.com', isabelaPassword, 'gestor', 'TI', false
+        '43091484840', 'Isabela Nascimento', 'isabela.nascimento@odequadro.com', isabelaPassword, 'gestor', 'TI', 'TI', false,
+        '44435264803', 'Vinicius Santos', 'vinicius.santos@odequadro.com', await bcrypt.hash('odq123', 10), 'gestor', 'Gati', 'Gati', false,
+        '41360394842', 'Guilherme Tosin', 'guilherme.tosin@odequadro.com', await bcrypt.hash('1senhadoGATI', 10), 'gestor', 'Gati', 'Gati', false,
+        '11111111111', 'Alexandre Marçal', 'alexandre.marcal@odequadro.com', await bcrypt.hash('esup123', 10), 'gestor', 'ESUP', 'ESUP', false,
+        '22222222222', 'Clara Nave', 'clara.nave@odequadro.com', await bcrypt.hash('p8metro123', 10), 'gestor', 'P8/Metro', 'P8,Metro', false,
+        '33333333333', 'Cristiane Silva', 'cristiane.silva@odequadro.com', await bcrypt.hash('revap123', 10), 'gestor', 'Revap', 'Revap', false,
+        '44444444444', 'Adriano', 'adriano@odequadro.com', await bcrypt.hash('adriano123', 10), 'gestor', 'Multi', 'TJ,Transpetro Logística,Transpetro Jurídico,FURP,REPLAN', false
       ]);
       
       console.log('✅ Usuário principal criado (Isabela - Gestora TI)');

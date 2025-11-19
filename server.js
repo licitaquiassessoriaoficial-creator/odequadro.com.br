@@ -1,3 +1,18 @@
+// Buscar todos os gestores reais (sem filtro de contrato)
+app.get('/api/gestores-todos', async (req, res) => {
+  try {
+    const [gestores] = await pool.query(`
+      SELECT id, nome
+      FROM users
+      WHERE role = 'gestor'
+      ORDER BY nome
+    `);
+    res.json({ gestores });
+  } catch (error) {
+    console.error('Erro ao buscar gestores:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
 const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');
