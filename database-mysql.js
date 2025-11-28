@@ -140,47 +140,14 @@ async function initializeDatabase() {
     `);
     
     // Criar tabela de currículos
-              const usuarios = [
-                { nome: 'Kevely', cpf: '55796696823', senha: 'Odq071123', role: 'dp', setor: 'Departamento Pessoal', contratos: null },
-                { nome: 'Kátia', cpf: '29539610893', senha: '874600', role: 'dp', setor: 'Departamento Pessoal', contratos: null },
-                { nome: 'Robinson Diretor', cpf: '26346512870', senha: '123456@', role: 'dp', setor: 'Departamento Pessoal', contratos: null },
-                { nome: 'Isabela Nascimento', cpf: '43091484840', senha: '230919', role: 'gestor', setor: 'TI', contratos: 'TI' },
-                { nome: 'Rafael Santos', cpf: '42507044837', senha: 'Quadro8746#', role: 'gestor', setor: 'TI', contratos: 'TI' },
-                { nome: 'Guilherme Tosin', cpf: '41360394842', senha: '1senhadoGATI', role: 'gestor', setor: 'Gati', contratos: 'Gati' },
-                { nome: 'Vinicius Santos', cpf: '44435264803', senha: 'senhaodq123', role: 'gestor', setor: 'Gati', contratos: 'Gati' },
-                { nome: 'Clara Nave', cpf: '16514242847', senha: 'Crn150269', role: 'gestor', setor: 'P8/Metro', contratos: 'P8,Metro' },
-                { nome: 'Alexandre Marçal', cpf: '07374845782', senha: 'asdfg12345', role: 'gestor', setor: 'ESUP', contratos: 'ESUP' },
-                { nome: 'Cristiane Alves', cpf: '29826777846', senha: '654321', role: 'gestor', setor: 'Revap', contratos: 'Revap' },
-                { nome: 'Adriano Bonfim', cpf: '28058450804', senha: 'Odq12345', role: 'gestor', setor: 'Multi', contratos: 'TJ,Transpetro Logística,Transpetro Jurídico,FURP,REPLAN' }
-              ];
-              for (const u of usuarios) {
-                const hashedPassword = await bcrypt.hash(u.senha, 10);
-                await connection.query(
-                  'INSERT INTO users (cpf, nome, senha, role, setor, contratos, first_login) VALUES (?, ?, ?, ?, ?, ?, TRUE)',
-                  [u.cpf.replace(/\D/g, ''), u.nome, hashedPassword, u.role, u.setor, u.contratos]
-                );
-                console.log(`✅ Usuário cadastrado: ${u.nome} | CPF: ${u.cpf} | Setor: ${u.setor}`);
-              }
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
-    
-    console.log('✅ Tabelas criadas/verificadas');
-    
-    // Verificar se já existem usuários
-    const [users] = await connection.query('SELECT COUNT(*) as count FROM users');
-    
-    if (users[0].count === 0) {
-      console.log('📝 Criando usuários iniciais...');
-      
-      // Criar usuário principal (Isabela - não precisa redefinir senha)
-      const isabelaPassword = await bcrypt.hash('230919', 10);
-      
-      await connection.query(`
-        INSERT INTO users (cpf, nome, email, senha, role, setor, contratos, first_login) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?),
-        (?, ?, ?, ?, ?, ?, ?, ?),
-        (?, ?, ?, ?, ?, ?, ?, ?),
-        (?, ?, ?, ?, ?, ?, ?, ?),
+      for (const u of usuarios) {
+        const hashedPassword = await bcrypt.hash(u.senha, 10);
+        await connection.query(
+          'INSERT INTO users (cpf, nome, senha, role, setor, contratos, first_login) VALUES (?, ?, ?, ?, ?, ?, TRUE)',
+          [u.cpf.replace(/\D/g, ''), u.nome, hashedPassword, u.role, u.setor, u.contratos]
+        );
+        console.log(`✅ Usuário cadastrado: ${u.nome} | CPF: ${u.cpf} | Setor: ${u.setor}`);
+      }
         (?, ?, ?, ?, ?, ?, ?, ?),
         (?, ?, ?, ?, ?, ?, ?, ?),
         (?, ?, ?, ?, ?, ?, ?, ?)
