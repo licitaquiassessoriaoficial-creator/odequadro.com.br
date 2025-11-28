@@ -28,7 +28,6 @@
             <li><a href="certificacoes.html">Certificações</a></li>
             <li><a href="noticias.html">Notícias</a></li>
             <li><a href="faq.html">FAQ</a></li>
-            <li><a href="trabalhe-conosco.html">Trabalhe Conosco</a></li>
             <li><a href="contato.html">Contato</a></li>
           </ul>
           <button class="nav-toggle" aria-expanded="false">
@@ -100,6 +99,17 @@
                   <i class="fas fa-sign-in-alt"></i>
                   Entrar no Sistema
                 </button>
+                <script>
+                  // Bloquear envio de dados sensíveis pela URL
+                  document.getElementById('loginForm').addEventListener('submit', function(e) {
+                    // Garante que o login será feito apenas via POST
+                    if (window.location.search.includes('cpf=') || window.location.search.includes('senha=')) {
+                      e.preventDefault();
+                      alert('Por segurança, nunca envie CPF ou senha pela URL. Use apenas o formulário de login.');
+                      window.location.search = '';
+                    }
+                  });
+                </script>
               </form>
               
               <!-- Formulário de Primeiro Acesso -->
@@ -123,12 +133,12 @@
                   <label for="primeiroSetor">Setor</label>
                   <select id="primeiroSetor" name="setor" required>
                     <option value="">Selecione seu setor</option>
+                    <option value="Departamento Pessoal">Departamento Pessoal</option>
                     <option value="Administrativo">Administrativo</option>
                     <option value="Financeiro">Financeiro</option>
                     <option value="Comercial">Comercial</option>
                     <option value="Operacional">Operacional</option>
                     <option value="Jurídico">Jurídico</option>
-                    <option value="Recursos Humanos">Recursos Humanos</option>
                     <option value="TI">TI</option>
                     <option value="Outros">Outros</option>
                   </select>
@@ -147,10 +157,10 @@
                   <label for="primeiroContratos">Contrato(s) que Gerencia</label>
                   <select id="primeiroContratos" name="contratos" multiple size="8">
                     <option value="ADM CAMP">ADM CAMP</option>
-                    <option value="ENGENHARIA SS">Engenharia SS</option>
+                    <option value="ESUP">ESUP</option>
                     <option value="FURP">FURP</option>
                     <option value="METRÔ FIS">METRÔ FIS</option>
-                    <option value="METRÔ JABAQUARA">Metrô Jabaquara</option>
+                    <option value="METRÔ JABA">METRÔ JABA</option>
                     <option value="P80">P80</option>
                     <option value="REPLAN">REPLAN</option>
                     <option value="REVAP">REVAP</option>
@@ -448,60 +458,41 @@
           </div>
           
           <form class="ticket-form" id="newTicketForm">
-            <div class="form-group" style="margin-bottom: 20px; width: 100%;">
-              <label for="contrato" style="font-weight: 600; color: #222;">Contrato</label>
-              <div style="display: flex; gap: 8px; align-items: center;">
-                <select id="contrato" name="contrato" required style="flex:1; min-width: 180px; padding: 10px; border-radius: 8px; border: 1px solid #ced4da; background: #fff; font-size: 1rem;">
-                  <option value="">Selecione o contrato</option>
-                  <option value="ADM CAMP">ADM CAMP</option>
-                  <option value="ESUP">ESUP</option>
-                  <option value="FURP">FURP</option>
-                  <option value="METRÔ FIS">METRÔ FIS</option>
-                  <option value="METRÔ JABA">METRÔ JABA</option>
-                  <option value="P80">P80</option>
-                  <option value="REPLAN">REPLAN</option>
-                  <option value="REVAP">REVAP</option>
-                  <option value="TJSP">TJSP</option>
-                  <option value="TRANSP JURI">TRANSP JURI</option>
-                  <option value="TRANSP LOG">TRANSP LOG</option>
-                  <option value="UNESP INTERIOR">UNESP INTERIOR</option>
-                  <option value="ESCRITÓRIO CENTRAL">ESCRITÓRIO CENTRAL</option>
-                  <option value="REPLAN CAMPINAS">REPLAN CAMPINAS</option>
-                  <option value="P-80">P-80</option>
-                  <option value="METRÔ (ANÁLISE)">METRÔ (ANÁLISE)</option>
-                  <option value="TJ - MOTORISTAS">TJ - MOTORISTAS</option>
-                  <option value="METRÔ ECONÔMICO">METRÔ ECONÔMICO</option>
-                  <option value="ENGENHARIA SS">ENGENHARIA SS</option>
-                  <option value="TRANSPETRO LOGISTICA">TRANSPETRO LOGISTICA</option>
-                </select>
-                <button type="button" id="btnSelecionarContrato" style="padding: 10px 16px; background: var(--color-primary, #2EB85C); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Selecionar</button>
-              </div>
+            <div class="form-group">
+              <label for="contrato">Contrato</label>
+              <select id="contrato" name="contrato" required>
+                <option value="">Selecione o contrato</option>
+                <option value="ADM CAMP">ADM CAMP</option>
+                <option value="ESUP">ESUP</option>
+                <option value="FURP">FURP</option>
+                <option value="METRÔ FIS">METRÔ FIS</option>
+                <option value="METRÔ JABA">METRÔ JABA</option>
+                <option value="P80">P80</option>
+                <option value="REPLAN">REPLAN</option>
+                <option value="REVAP">REVAP</option>
+                <option value="TJSP">TJSP</option>
+                <option value="TRANSP JURI">TRANSP JURI</option>
+                <option value="TRANSP LOG">TRANSP LOG</option>
+                <option value="UNESP INTERIOR">UNESP INTERIOR</option>
+                <option value="ESCRITÓRIO CENTRAL">ESCRITÓRIO CENTRAL</option>
+                <option value="REPLAN CAMPINAS">REPLAN CAMPINAS</option>
+                <option value="P-80">P-80</option>
+                <option value="METRÔ (ANÁLISE)">METRÔ (ANÁLISE)</option>
+                <option value="TJ - MOTORISTAS">TJ - MOTORISTAS</option>
+                <option value="METRÔ ECONÔMICO">METRÔ ECONÔMICO</option>
+                <option value="ENGENHARIA SS">ENGENHARIA SS</option>
+                <option value="TRANSPETRO LOGISTICA">TRANSPETRO LOGISTICA</option>
+              </select>
             </div>
             
             <div class="form-group">
-              <label for="contrato" style="font-weight: 600; color: #222;">Contrato</label>
-              <select id="contrato" name="contrato" required style="width: 100%; min-width: 180px; padding: 10px; border-radius: 8px; border: 1px solid #ced4da; background: #fff; font-size: 1rem;">
-                <option value="ESCRITÓRIO CENTRAL">ESCRITÓRIO CENTRAL</option>
-                <option value="ESUP | ENGENHARIA SS">ESUP | ENGENHARIA SS</option>
-                <option value="METRÔ FISCAL">METRÔ FISCAL</option>
-                <option value="METRÔ JABAQUARA">METRÔ JABAQUARA</option>
-                <option value="REVAP">REVAP</option>
-                <option value="REPLAN">REPLAN</option>
-                <option value="P80">P80</option>
-                <option value="TRANSPETRO JURÍDICO">TRANSPETRO JURÍDICO</option>
-                <option value="TRANSPETRO LOGÍSTICA">TRANSPETRO LOGÍSTICA</option>
-              </select>
-            </div>
-            <div class="form-group">
               <label for="gestor">Gestor Responsável</label>
-              <select id="gestor" name="gestor_id" style="text-transform: uppercase; font-weight: 600;">
-                <option value="">Selecione o gestor</option>
-                <option value="CLARA NAVE">CLARA NAVE</option>
-                <option value="ALEXANDRE MARÇAL">ALEXANDRE MARÇAL</option>
-                <option value="ADRIANO BONFIM">ADRIANO BONFIM</option>
-                <option value="CRISTIANE ALVES">CRISTIANE ALVES</option>
+              <select id="gestor" name="gestor_id">
+                <option value="">Carregando gestores...</option>
               </select>
-              <small class="helper-text" style="color: #229954; font-weight: bold;">Selecione o gestor responsável</small>
+              <small class="helper-text">
+                Serão exibidos apenas gestores do contrato selecionado
+              </small>
             </div>
             
             <div class="form-group">
@@ -509,8 +500,9 @@
               <select id="setor" name="setor" required>
                 <option value="">Selecione o setor responsável</option>
                 <option value="Departamento Pessoal">Departamento Pessoal</option>
+                <option value="Facilities">Facilities</option>
+                <option value="Recursos Humanos">Recursos Humanos</option>
                 <option value="TI">TI - Tecnologia da Informação</option>
-                <option value="GATI">GATI - Segurança do Trabalho</option>
                 <option value="Financeiro">Financeiro</option>
                 <option value="Administrativo">Administrativo</option>
                 <option value="Outros">Outros</option>
@@ -548,11 +540,6 @@
             <div class="form-group">
               <label for="descricao">Descrição Detalhada</label>
               <textarea id="descricao" name="descricao" rows="5" placeholder="Detalhe sua solicitação ou problema..." maxlength="1000" minlength="20" required></textarea>
-            </div>
-            <div class="form-group" style="margin-bottom: 20px; width: 100%;">
-              <label for="ticketImagem" style="font-weight: 600; color: #222;">Anexar Imagem</label>
-              <input type="file" id="ticketImagem" name="imagem" accept="image/*" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ced4da; background: #fff; font-size: 1rem;" />
-              <small style="color: #666; font-size: 12px; display: block; margin-top: 4px;">Formatos permitidos: JPG, PNG, GIF. Tamanho máximo: 5MB.</small>
             </div>
 
             <div class="form-actions">
